@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-zh="AIHues — 找到你的 AI vibe">AIHues — Find your AI vibe</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+ --bg:#ffffff;--surface:#f8f9fb;--surface-hover:#f1f3f7;
+ --border:#e8ecf1;--border-hover:#d1d8e0;
+ --text:#0f172a;--text-secondary:#475569;--text-muted:#94a3b8;
+ --accent:#6d28d9;--accent-light:#8b5cf6;--accent-gradient:linear-gradient(135deg,#6d28d9,#8b5cf6);
+ --green:#059669;--green-bg:#ecfdf5;--blue:#2563eb;--blue-bg:#eff6ff;--orange:#ea580c;
+ --radius:14px;--radius-sm:10px;
+ --shadow:0 1px 3px rgba(0,0,0,0.04),0 4px 16px rgba(0,0,0,0.04);
+ --shadow-hover:0 4px 12px rgba(109,40,217,0.12),0 8px 32px rgba(0,0,0,0.08);
+}
+body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}
+::selection{background:var(--accent-light);color:#fff}
+
+/* ===== NAV ===== */
+.nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.92);backdrop-filter:blur(20px) saturate(180%);border-bottom:1px solid var(--border)}
+.nav-inner{max-width:1300px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:68px}
+.logo{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:800;color:var(--text);letter-spacing:-1px;text-decoration:none}
+.logo-mark{width:34px;height:34px;border-radius:10px;background:var(--accent-gradient);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:700;box-shadow:0 2px 8px rgba(109,40,217,0.3)}
+.nav-links{display:flex;gap:28px;align-items:center}
+.nav-links a{color:var(--text-secondary);font-size:14px;font-weight:500;transition:color .2s;text-decoration:none}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{padding:9px 20px;border-radius:10px;background:var(--accent-gradient);color:#fff;font-size:14px;font-weight:600;box-shadow:0 2px 8px rgba(109,40,217,0.25);transition:all .2s;display:flex;align-items:center;gap:6px;text-decoration:none}
+.nav-cta:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(109,40,217,0.35)}
+.lang-btn{padding:8px 16px;border-radius:8px;background:var(--surface);border:1px solid var(--border);color:var(--text-secondary);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.lang-btn:hover{border-color:var(--accent-light);color:var(--accent)}
+
+/* ===== HERO (compact) ===== */
+.hero{text-align:center;padding:60px 32px 32px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-300px;left:50%;transform:translateX(-50%);width:800px;height:800px;background:radial-gradient(circle,rgba(109,40,217,0.06) 0%,transparent 70%);border-radius:50%;pointer-events:none}
+.hero-inner{max-width:680px;margin:0 auto;position:relative}
+.hero h1{font-size:48px;font-weight:800;line-height:1.08;letter-spacing:-2px;margin-bottom:10px}
+.hero h1 .gradient{background:var(--accent-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero>p{color:var(--text-secondary);font-size:16px;line-height:1.6;margin-bottom:20px}
+
+/* Compact Agent */
+.agent-box{max-width:560px;margin:0 auto 16px;background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:4px;display:flex;align-items:center;gap:6px;box-shadow:var(--shadow);transition:all .2s}
+.agent-box:focus-within{border-color:var(--accent-light);box-shadow:0 4px 20px rgba(109,40,217,0.1)}
+.agent-box input{flex:1;border:none;outline:none;padding:10px 12px;font-size:14px;background:transparent;color:var(--text)}
+.agent-box input::placeholder{color:var(--text-muted);font-size:13px}
+.agent-box button{padding:10px 20px;border-radius:10px;background:var(--accent-gradient);color:#fff;font-size:13px;font-weight:600;border:none;cursor:pointer;transition:all .2s}
+.agent-box button:hover{box-shadow:0 4px 16px rgba(109,40,217,0.35)}
+.agent-tags{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:4px}
+.agent-tag{padding:5px 12px;border-radius:8px;background:var(--surface);border:1px solid var(--border);color:var(--text-secondary);font-size:12px;font-weight:500;cursor:pointer;transition:all .2s}
+.agent-tag:hover{border-color:var(--accent-light);color:var(--accent);background:rgba(109,40,217,0.04);transform:translateY(-1px)}
+
+/* ===== CATEGORIES (right below hero) ===== */
+.cat-section{max-width:1300px;margin:0 auto;padding:0 32px 40px}
+.cat-section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.cat-section-header h2{font-size:20px;font-weight:700}
+.cat-section-header a{font-size:14px;color:var(--accent);font-weight:600}
+.cat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.cat-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:18px;cursor:pointer;transition:all .25s;text-decoration:none;color:inherit;display:block}
+.cat-card:hover{border-color:var(--accent-light);box-shadow:var(--shadow-hover);transform:translateY(-2px)}
+.cat-header{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.cat-icon{font-size:20px}
+.cat-name{font-size:14px;font-weight:700;flex:1;color:var(--text)}
+.cat-count{font-size:11px;color:var(--text-muted);background:var(--surface);padding:2px 8px;border-radius:6px;font-weight:600}
+.cat-desc{font-size:12px;color:var(--text-secondary);line-height:1.4;margin-bottom:10px}
+.cat-tools{display:flex;flex-wrap:wrap;gap:5px}
+.cat-tool-tag{font-size:10px;padding:2px 8px;border-radius:5px;background:var(--surface);color:var(--text-muted);border:1px solid var(--border)}
+
+/* ===== STATS BAR ===== */
+.stats-bar{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:20px 32px}
+.stats-bar-inner{max-width:1300px;margin:0 auto;display:flex;justify-content:center;gap:60px}
+.stat-item{text-align:center}
+.stat-num{font-size:24px;font-weight:800;background:var(--accent-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-label{font-size:12px;color:var(--text-muted);font-weight:500}
+
+/* ===== NEW DEV TOOLS SECTION ===== */
+.section{max-width:1300px;margin:0 auto;padding:48px 32px}
+.section-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px}
+.section-header h2{font-size:24px;font-weight:700;letter-spacing:-0.5px}
+.section-header a{font-size:14px;color:var(--accent);font-weight:600}
+.section-count{font-size:14px;color:var(--text-muted);background:var(--surface);padding:6px 14px;border-radius:20px;border:1px solid var(--border)}
+
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.tool-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:22px;transition:all .2s;cursor:pointer;text-decoration:none;color:inherit;display:block;position:relative}
+.tool-card:hover{transform:translateY(-2px);border-color:var(--accent-light);box-shadow:var(--shadow-hover)}
+.tool-card .icon-wrap{width:42px;height:42px;border-radius:11px;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:12px;border:1px solid var(--border);transition:all .2s}
+.tool-card:hover .icon-wrap{background:var(--accent-gradient);color:#fff;border-color:transparent}
+.tool-card h3{font-size:15px;font-weight:600;margin-bottom:4px;color:var(--text)}
+.tool-card p{font-size:12px;color:var(--text-secondary);line-height:1.45;margin:0}
+.badge-new{position:absolute;top:12px;right:12px;background:var(--accent-gradient);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px;letter-spacing:0.5px}
+
+/* ===== GAMES SECTION ===== */
+.games-section{background:var(--surface);border-top:1px solid var(--border)}
+.games-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.game-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:28px;text-align:center;transition:all .2s;cursor:pointer;text-decoration:none;color:inherit;display:block}
+.game-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-hover)}
+.game-card .game-icon{font-size:48px;margin-bottom:12px;display:block}
+.game-card h3{font-size:18px;font-weight:700;margin-bottom:6px}
+.game-card p{font-size:13px;color:var(--text-secondary);margin-bottom:16px;line-height:1.5}
+.game-card .play-btn{display:inline-block;padding:11px 28px;border-radius:10px;background:var(--accent-gradient);color:#fff;font-size:14px;font-weight:600;transition:all .2s}
+.game-card:hover .play-btn{transform:translateY(-2px);box-shadow:0 4px 16px rgba(109,40,217,0.35)}
+.credit-bar{display:flex;align-items:center;justify-content:space-between;background:rgba(109,40,217,0.04);border-radius:var(--radius);border:1px solid rgba(109,40,217,0.1);padding:14px 20px;margin-bottom:24px}
+.credit-bar .info{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text-secondary)}
+.credit-bar .coin{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#d4a843,#f0c864);display:flex;align-items:center;justify-content:center;font-size:12px}
+.credit-bar .balance{font-size:18px;font-weight:700;color:var(--accent)}
+
+/* ===== REVIEWS ===== */
+.review-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.review-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:22px;transition:all .2s;cursor:pointer;text-decoration:none;color:inherit;display:block}
+.review-card:hover{box-shadow:var(--shadow-hover);border-color:var(--border-hover)}
+.review-tag{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--accent);margin-bottom:10px}
+.review-title{font-size:15px;font-weight:700;line-height:1.4;margin-bottom:6px}
+.review-excerpt{font-size:13px;color:var(--text-secondary);line-height:1.55;margin-bottom:12px}
+.review-meta{font-size:12px;color:var(--text-muted)}
+
+/* ===== GACHA CTA ===== */
+.gacha-cta{background:linear-gradient(135deg,#0f0a1e,#1a1040,#0f0a1e);color:#fff;padding:36px 44px;border-radius:var(--radius);display:flex;align-items:center;justify-content:space-between;gap:32px;position:relative;overflow:hidden}
+.gacha-cta::before{content:'';position:absolute;top:-50%;right:-20%;width:400px;height:400px;background:radial-gradient(circle,rgba(109,40,217,0.15),transparent 70%);border-radius:50%}
+.gacha-left{position:relative;z-index:1;flex:1}
+.gacha-badges{display:flex;gap:8px;margin-bottom:14px}
+.gacha-badge{padding:4px 12px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:1px}
+.gacha-badge.rare{background:rgba(37,99,235,0.2);color:#60a5fa;border:1px solid rgba(37,99,235,0.3)}
+.gacha-badge.epic{background:rgba(109,40,217,0.2);color:#c084fc;border:1px solid rgba(109,40,217,0.3)}
+.gacha-cta h3{font-size:22px;font-weight:700;margin-bottom:6px}
+.gacha-cta p{opacity:0.7;font-size:13px;margin-bottom:14px;max-width:420px}
+.gacha-btn{position:relative;z-index:1;padding:14px 32px;border-radius:12px;background:var(--accent-gradient);color:#fff;font-size:15px;font-weight:600;border:none;cursor:pointer;text-decoration:none;display:flex;align-items:center;gap:8px;box-shadow:0 4px 24px rgba(109,40,217,0.4);flex-shrink:0;transition:all .2s}
+.gacha-btn:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(109,40,217,0.5)}
+
+/* ===== WISHLIST CTA ===== */
+.wishlist-cta{background:var(--accent-gradient);color:#fff;padding:44px 32px;border-radius:var(--radius);text-align:center;margin-top:40px}
+.wishlist-cta h3{font-size:22px;font-weight:700;margin-bottom:6px}
+.wishlist-cta p{opacity:0.9;margin-bottom:18px;font-size:14px}
+.wishlist-btn{padding:11px 28px;border-radius:10px;background:#fff;color:var(--accent);font-size:14px;font-weight:600;border:none;cursor:pointer;text-decoration:none;display:inline-block;transition:all .2s}
+.wishlist-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,0.15)}
+
+/* ===== FOOTER ===== */
+.footer{border-top:1px solid var(--border);padding:48px 32px}
+.footer-inner{max-width:1300px;margin:0 auto}
+.footer-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;flex-wrap:wrap;gap:24px}
+.footer-brand .logo{font-size:20px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.footer-brand p{color:var(--text-muted);font-size:14px}
+.footer-links{display:flex;gap:40px;flex-wrap:wrap}
+.footer-col h4{font-size:14px;margin-bottom:12px}
+.footer-col a{display:block;color:var(--text-muted);font-size:14px;margin-bottom:8px;text-decoration:none}
+.footer-col a:hover{color:var(--text)}
+.footer-bottom{text-align:center;color:var(--text-muted);font-size:13px;padding-top:24px;border-top:1px solid var(--border)}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:768px){
+ .hero h1{font-size:34px}
+ .cat-grid{grid-template-columns:repeat(2,1fr)}
+ .games-grid{grid-template-columns:1fr}
+ .review-grid{grid-template-columns:1fr}
+ .stats-bar-inner{gap:20px}
+ .tools-grid{grid-template-columns:1fr}
+ .gacha-cta{flex-direction:column;text-align:center;padding:28px 24px}
+ .nav-inner{padding:0 20px}
+ .section{padding:32px 20px}
+ .cat-section{padding:0 20px 32px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+ <div class="nav-inner">
+ <a href="index.html" class="logo"><div class="logo-mark">H</div><span data-zh="AIHues">AIHues</span></a>
+ <div class="nav-links">
+ <a href="#categories" data-zh="分类">Categories</a>
+ <a href="#new-tools" data-zh="工具">Tools</a>
+ <a href="#games" data-zh="游戏">Games</a>
+ <a href="wishlist.html" data-zh="许愿单">Wishlist</a>
+ <a href="ranking.html" data-zh="排行榜">Ranking</a>
+ </div>
+ <div style="display:flex;gap:10px;align-items:center">
+ <button class="lang-btn" onclick="toggleLang()" data-zh="EN">中文</button>
+ <a href="login.html" class="nav-cta"><span data-zh="登录">Login</span></a>
+ </div>
+ </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+ <div class="hero-inner">
+ <h1><span data-zh="找到你的">Find your</span> <span class="gradient" data-zh="AI vibe">AI vibe</span></h1>
+ <p data-zh="35+ AI 工具、小游戏和实用工具，像人一样自然。告诉我们你需要什么。">
+ 35+ AI tools, mini games & utilities that just work. Tell us what you need.
+ </p>
+ <!-- Compact Agent -->
+ <div class="agent-box">
+ <input type="text" id="agentInput" placeholder="e.g. 'parse JWT' or 'test regex'..." data-zh-placeholder="例如：解析JWT、测试正则、生成二维码..." onkeydown="if(event.key==='Enter')agentSearch()">
+ <button onclick="agentSearch()" data-zh="查找">Find</button>
+ </div>
+ <div class="agent-tags">
+ <span class="agent-tag" onclick="goTool('tools/jwt.html')">JWT</span>
+ <span class="agent-tag" onclick="goTool('tools/json.html')">JSON</span>
+ <span class="agent-tag" onclick="goTool('tools/regex.html')">Regex</span>
+ <span class="agent-tag" onclick="goTool('tools/qrcode.html')">QR Code</span>
+ <span class="agent-tag" onclick="goTool('games/daily-luck.html')">Fortune</span>
+ <span class="agent-tag" onclick="goTool('games/basketball.html')">Hoops</span>
+ </div>
+ </div>
+</section>
+
+<!-- CATEGORIES -->
+<section class="cat-section" id="categories">
+ <div class="cat-section-header">
+ <h2 data-zh="按分类浏览">Browse by category</h2>
+ <a href="#new-tools" data-zh="查看全部工具 →">See all tools →</a>
+ </div>
+ <div class="cat-grid">
+ <a href="#writing" class="cat-card">
+ <div class="cat-header"><span class="cat-icon">✍️</span><span class="cat-name" data-zh="写作">Writing</span><span class="cat-count">7</span></div>
+ <div class="cat-desc" data-zh="字数统计、Diff对比、Markdown预览、全角半角转换">Word Count, Diff, Markdown, Fullwidth</div>
+ <div class="cat-tools"><span class="cat-tool-tag">Word Count</span><span class="cat-tool-tag">Markdown</span><span class="cat-tool-tag">Fullwidth</span></div>
+ </a>
+ <a href="#developer" class="cat-card">
+ <div class="cat-header"><span class="cat-icon">💻</span><span class="cat-name" data-zh="开发">Developer</span><span class="cat-count">10</span></div>
+ <div class="cat-desc" data-zh="JWT解析、JSON格式化、正则测试、Base64、SQL美化">JWT, JSON, Regex, Base64, UUID, Timestamp, SHA256</div>
+ <div class="cat-tools"><span class="cat-tool-tag">JWT</span><span class="cat-tool-tag">JSON</span><span class="cat-tool-tag">Regex</span><span class="cat-tool-tag">SHA256</span></div>
+ </a>
+ <a href="#growth" class="cat-card">
+ <div class="cat-header"><span class="cat-icon">📈</span><span class="cat-name" data-zh="增长">Growth</span><span class="cat-count">3</span></div>
+ <div class="cat-desc" data-zh="二维码生成、A/B测试计算、SEO工具">QR Code, A/B Calculator, SEO</div>
+ <div class="cat-tools"><span class="cat-tool-tag">QR Code</span><span class="cat-tool-tag">A/B Test</span></div>
+ </a>
+ <a href="#games" class="cat-card">
+ <div class="cat-header"><span class="cat-icon">🎮</span><span class="cat-name" data-zh="小游戏">Games</span><span class="cat-count">3</span></div>
+ <div class="cat-desc" data-zh="日历幸运签、老虎机、投篮挑战，赚取Credit">Daily Fortune, Slots, Hoops — earn Credits</div>
+ <div class="cat-tools"><span class="cat-tool-tag">Fortune</span><span class="cat-tool-tag">Slots</span><span class="cat-tool-tag">Hoops</span></div>
+ </a>
+ </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar">
+ <div class="stats-bar-inner">
+ <div class="stat-item"><div class="stat-num">17</div><div class="stat-label" data-zh="AI 工具">AI Tools</div></div>
+ <div class="stat-item"><div class="stat-num">7</div><div class="stat-label" data-zh="开发工具">Dev Tools</div></div>
+ <div class="stat-item"><div class="stat-num">3</div><div class="stat-label" data-zh="小游戏">Games</div></div>
+ <div class="stat-item"><div class="stat-num">100</div><div class="stat-label" data-zh="免费积分">Free Credits</div></div>
+ <div class="stat-item"><div class="stat-num">3</div><div class="stat-label" data-zh="连击天数">Day Streak</div></div>
+ </div>
+</div>
+
+<!-- NEW DEV TOOLS -->
+<section class="section" id="new-tools">
+ <div class="section-header" id="developer">
+ <h2 data-zh="🛠️ 开发工具（本周新增）">🛠️ Developer Tools (New This Week)</h2>
+ <span class="section-count">7 tools</span>
+ </div>
+ <div class="tools-grid">
+ <a href="tools/jwt.html" class="tool-card"><span class="badge-new">NEW</span>
+ <div class="icon-wrap">🔐</div><h3 data-zh="JWT 解析器">JWT Parser</h3><p data-zh="解码并检查JWT令牌的头部、载荷和签名">Decode & inspect JWT tokens</p></a>
+ <a href="tools/json.html" class="tool-card"><span class="badge-new">NEW</span>
+ <div class="icon-wrap">📋</div><h3 data-zh="JSON 格式化">JSON Formatter</h3><p data-zh="格式化、校验和美化JSON，支持语法高亮">Format, validate & beautify JSON</p></a>
+ <a href="tools/regex.html" class="tool-card"><span class="badge-new">NEW</span>
+ <div class="icon-wrap">🔍</div><h3 data-zh="正则测试器">Regex Tester</h3><p data-zh="实时匹配高亮，8种常用预设">Live match highlighting + 8 presets</p></a>
+ <a href="tools/uuid.html" class="tool-card"><span class="badge-new">NEW</span>
+ <div class="icon-wrap">🆔</div><h3 data-zh="UUID 生成器">UUID Generator</h3><p data-zh="批量生成随机UUID v4，支持验证">Generate UUIDs in bulk with validation</p></a>
+ <a href="tools/timestamp.html" class="tool-card"><span class="badge-new">NEW</span>
+ <div class="icon-wrap">⏱️</div><h3 data-zh="时间戳转换">Timestamp</h3><p data-zh="Unix时间戳与可读日期双向转换">Unix timestamp &harr; human date</p></a>
+ <a href="tools/markdown.html" class="tool-card"><span class="badge-new">NEW</span>
+ <div class="icon-wrap">📝</div><h3 data-zh="Markdown 预览">Markdown Preview</h3><p data-zh="实时GFM预览，双栏可拖拽编辑">Live GFM preview with split editor</p></a>
+ <a href="tools/qrcode.html" class="tool-card"><span class="badge-new">NEW</span>
+ <div class="icon-wrap">📱</div><h3 data-zh="二维码生成">QR Code</h3><p data-zh="为URL、文本、WiFi、邮箱生成二维码">QR codes for URL, WiFi, Email & more</p></a>
+ </div>
+</section>
+
+<!-- WRITING TOOLS -->
+<section class="section" style="padding-top:0" id="writing">
+ <div class="section-header">
+ <h2 data-zh="✍️ 写作与实用工具">✍️ Writing & Utility</h2>
+ <span class="section-count">7 tools</span>
+ </div>
+ <div class="tools-grid">
+ <a href="tools/word-count.html" class="tool-card">
+ <div class="icon-wrap">📊</div><h3 data-zh="字数统计">Word Counter</h3><p data-zh="实时字数、字符数、阅读时长">Real-time word count & reading time</p></a>
+ <a href="tools/base64.html" class="tool-card">
+ <div class="icon-wrap">🔢</div><h3 data-zh="Base64 编解码">Base64</h3><p data-zh="Base64编码与解码转换">Base64 encode & decode</p></a>
+ <a href="tools/diff.html" class="tool-card">
+ <div class="icon-wrap">📑</div><h3 data-zh="文本对比">Diff Checker</h3><p data-zh="对比两段文本的差异">Compare text differences</p></a>
+ <a href="tools/fullwidth.html" class="tool-card"><span class="badge-new">NEW</span>
+ <div class="icon-wrap">↔️</div><h3 data-zh="全角半角转换">Fullwidth</h3><p data-zh="全角半角转换，清理空格换行">Fullwidth &harr; Halfwidth + space cleanup</p></a>
+ <a href="tools/sha256.html" class="tool-card"><span class="badge-new">NEW</span>
+ <div class="icon-wrap">🔒</div><h3 data-zh="SHA256 哈希">SHA256 Hash</h3><p data-zh="计算文本和文件的SHA256/MD5/SHA1">Hash text & files with SHA-256/MD5/SHA-1</p></a>
+ <a href="tools/chi-squared.html" class="tool-card"><span class="badge-new">NEW</span>
+ <div class="icon-wrap">📊</div><h3 data-zh="A/B 测试计算器">A/B Calculator</h3><p data-zh="卡方检验计算统计显著性">Chi-Squared statistical significance</p></a>
+ <a href="tools/sql.html" class="tool-card">
+ <div class="icon-wrap">🗄️</div><h3 data-zh="SQL 美化">SQL Formatter</h3><p data-zh="格式化SQL查询语句">Format SQL queries</p></a>
+ </div>
+</section>
+
+<!-- GAMES -->
+<section class="games-section" id="games">
+ <div class="section">
+ <div class="section-header">
+ <h2 data-zh="🎮 小游戏中心">🎮 Game Center</h2>
+ <span class="section-count">3 games</span>
+ </div>
+ <div class="credit-bar">
+ <div class="info"><div class="coin">🪙</div><span data-zh="你的 Credit 余额">Your Credit Balance</span></div>
+ <span class="balance" id="creditDisplay">100</span>
+ </div>
+ <div class="games-grid">
+ <a href="games/daily-luck.html" class="game-card">
+ <span class="game-icon">📅</span>
+ <h3 data-zh="日历幸运签">Daily Fortune</h3>
+ <p data-zh="每天抽一签，获取箴言和Credit奖励">Daily draw for wisdom & Credit rewards</p>
+ <span class="play-btn" data-zh="抽签 →">Draw →</span>
+ </a>
+ <a href="games/slot-machine.html" class="game-card">
+ <span class="game-icon">🎰</span>
+ <h3 data-zh="幸运老虎机">Lucky Slots</h3>
+ <p data-zh="每日3次免费旋转，赢取大奖">3 free spins daily, win big prizes</p>
+ <span class="play-btn" data-zh="旋转 →">Spin →</span>
+ </a>
+ <a href="games/basketball.html" class="game-card">
+ <span class="game-icon">🏀</span>
+ <h3 data-zh="投篮挑战">Hoops Challenge</h3>
+ <p data-zh="60秒投篮，挑战最高分">60 seconds to score maximum points</p>
+ <span class="play-btn" data-zh="投篮 →">Play →</span>
+ </a>
+ </div>
+ </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="section">
+ <div class="section-header">
+ <h2 data-zh="🔥 热门工具">🔥 Popular Tools</h2>
+ <a href="ranking.html" data-zh="查看全部 →">View all →</a>
+ </div>
+ <div class="review-grid">
+ <a href="tools/jwt.html" class="review-card">
+ <div class="review-tag">DEVELOPER · 5★</div>
+ <div class="review-title" data-zh="JWT 解析器 — 开发必备">JWT Parser — Dev Essential</div>
+ <div class="review-excerpt" data-zh="一键解析JWT，自动检测过期时间，JSON语法高亮">One-click JWT decode with expiry detection & JSON highlighting</div>
+ <div class="review-meta">Ease 98 · Speed 96 · Utility 95</div>
+ </a>
+ <a href="tools/json.html" class="review-card">
+ <div class="review-tag">DEVELOPER · 5★</div>
+ <div class="review-title" data-zh="JSON 格式化 — 最优雅的格式化工具">JSON Formatter — Most Elegant</div>
+ <div class="review-excerpt" data-zh="暗色主题语法高亮、树形折叠、错误精确定位">Dark theme highlighting, collapsible tree, precise error locating</div>
+ <div class="review-meta">Ease 95 · Quality 97 · Design 94</div>
+ </a>
+ <a href="games/daily-luck.html" class="review-card">
+ <div class="review-tag">GAME · 4.8★</div>
+ <div class="review-title" data-zh="日历幸运签 — 日活神器">Daily Fortune — Retention King</div>
+ <div class="review-excerpt" data-zh="30条箴言、3D翻转卡片、连续签到奖励">30 wisdom quotes, 3D card flip, streak rewards & confetti</div>
+ <div class="review-meta">Fun 96 · Design 95 · Retention 92</div>
+ </a>
+ </div>
+</section>
+
+<!-- GACHA CTA -->
+<section class="section" style="padding-top:0">
+ <div class="gacha-cta">
+ <div class="gacha-left">
+ <div class="gacha-badges">
+ <span class="gacha-badge rare">DEV</span>
+ <span class="gacha-badge epic">GAMES</span>
+ </div>
+ <h3 data-zh="工具 + 游戏双引擎">Tools + Games Dual Engine</h3>
+ <p data-zh="用完工具玩一把，放松一下。14款工具覆盖全场景，3款游戏保留存。">Use tools, then play a game to relax. 14 tools + 3 games = complete platform.</p>
+ </div>
+ <a href="#new-tools" class="gacha-btn">
+ <span data-zh="浏览全部工具">Browse All Tools</span>
+ <span style="font-size:18px">→</span>
+ </a>
+ </div>
+</section>
+
+<!-- WISHLIST -->
+<section class="section" style="padding-top:20px">
+ <div class="wishlist-cta">
+ <h3 data-zh="找不到需要的工具？">Can't find what you need?</h3>
+ <p data-zh="把工具想法提交到许愿清单，最受欢迎的优先开发。">Submit your idea. Top requests get built first.</p>
+ <a href="wishlist.html" class="wishlist-btn" data-zh="提交你的想法 →">Submit Your Idea →</a>
+ </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+ <div class="footer-inner">
+ <div class="footer-top">
+ <div class="footer-brand">
+ <div class="logo"><div class="logo-mark">H</div><span>AIHues</span></div>
+ <p data-zh="找到你的 AI vibe。17款工具 + 3款游戏，像人一样自然。">Find your AI vibe. 17 tools + 3 games<br>that feel human.</p>
+ </div>
+ <div class="footer-links">
+ <div class="footer-col">
+ <h4 data-zh="产品">Product</h4>
+ <a href="index.html" data-zh="全部工具">Tools</a>
+ <a href="#categories" data-zh="分类">Categories</a>
+ <a href="wishlist.html" data-zh="许愿单">Wishlist</a>
+ <a href="pricing.html" data-zh="定价">Pricing</a>
+ </div>
+ <div class="footer-col">
+ <h4 data-zh="游戏">Games</h4>
+ <a href="games/daily-luck.html" data-zh="日历幸运签">Daily Fortune</a>
+ <a href="games/slot-machine.html" data-zh="老虎机">Lucky Slots</a>
+ <a href="games/basketball.html" data-zh="投篮挑战">Hoops Challenge</a>
+ </div>
+ <div class="footer-col">
+ <h4 data-zh="公司">Company</h4>
+ <a href="#" data-zh="关于">About</a>
+ <a href="#" data-zh="博客">Blog</a>
+ <a href="#" data-zh="条款">Terms</a>
+ </div>
+ </div>
+ </div>
+ <div class="footer-bottom" data-zh="找到你的 AI vibe · 基于 Kimi 构建">© 2026 AIHues · Find your AI vibe · Built on Kimi</div>
+ </div>
+</footer>
+
+<script src="js/i18n.js"></script>
+<script>
+function goTool(url){window.location.href=url}
+function agentSearch(){
+ const input=document.getElementById('agentInput').value.trim().toLowerCase();
+ if(!input)return;
+ const toolMap={
+  jwt:'tools/jwt.html',json:'tools/json.html',regex:'tools/regex.html',
+  uuid:'tools/uuid.html',time:'tools/timestamp.html',stamp:'tools/timestamp.html',
+  markdown:'tools/markdown.html',md:'tools/markdown.html',qr:'tools/qrcode.html',
+  qrcode:'tools/qrcode.html',code:'tools/qrcode.html',base64:'tools/base64.html',
+  diff:'tools/diff.html',word:'tools/word-count.html',count:'tools/word-count.html',
+  sha:'tools/sha256.html',hash:'tools/sha256.html',md5:'tools/sha256.html',
+  fullwidth:'tools/fullwidth.html',width:'tools/fullwidth.html',half:'tools/fullwidth.html',
+  ab:'tools/chi-squared.html',chi:'tools/chi-squared.html',test:'tools/chi-squared.html',
+  sql:'tools/sql.html',seo:'tools/seo-title.html',
+  fortune:'games/daily-luck.html',luck:'games/daily-luck.html',daily:'games/daily-luck.html',
+  slot:'games/slot-machine.html',slots:'games/slot-machine.html',machine:'games/slot-machine.html',
+  basketball:'games/basketball.html',hoops:'games/basketball.html',ball:'games/basketball.html'
+ };
+ for(const[key,val]of Object.entries(toolMap)){if(input.includes(key)){goTool(val);return}}
+ alert('Tool not found. Try: jwt, json, regex, uuid, timestamp, markdown, qrcode, sha256, fortune, slots, hoops');
+}
+// Credit
+function loadCredit(){const c=localStorage.getItem('aihues_credit');if(c)document.getElementById('creditDisplay').textContent=c}
+loadCredit();
+// i18n toggle
+function toggleLang(){/* placeholder */}
+</script>
+</body>
+</html>

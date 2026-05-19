@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SEO Title Generator — AIHues</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+ --bg:#ffffff;--surface:#f8f9fb;--surface-hover:#f1f3f7;
+ --border:#e8ecf1;--border-hover:#d1d8e0;
+ --text:#0f172a;--text-secondary:#475569;--text-muted:#94a3b8;
+ --accent:#6d28d9;--accent-light:#8b5cf6;--accent-gradient:linear-gradient(135deg,#6d28d9,#8b5cf6);
+ --green:#059669;--green-bg:#ecfdf5;
+ --radius:14px;--radius-sm:10px;
+ --shadow:0 1px 3px rgba(0,0,0,0.04),0 4px 16px rgba(0,0,0,0.04);
+ --shadow-hover:0 4px 12px rgba(109,40,217,0.12),0 8px 32px rgba(0,0,0,0.08);
+}
+body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+
+.nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.92);backdrop-filter:blur(20px) saturate(180%);border-bottom:1px solid var(--border)}
+.nav-inner{max-width:1300px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:68px}
+.logo{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:800;color:var(--text);letter-spacing:-1px;text-decoration:none}
+.logo-mark{width:34px;height:34px;border-radius:10px;background:var(--accent-gradient);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:700;box-shadow:0 2px 8px rgba(109,40,217,0.3)}
+.nav-links{display:flex;gap:28px;align-items:center}
+.nav-links a{color:var(--text-secondary);font-size:14px;font-weight:500;transition:color .2s;text-decoration:none}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{padding:9px 20px;border-radius:10px;background:var(--accent-gradient);color:#fff;font-size:14px;font-weight:600;box-shadow:0 2px 8px rgba(109,40,217,0.25);transition:all .2s;display:flex;align-items:center;gap:6px;text-decoration:none}
+.nav-cta:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(109,40,217,0.35)}
+
+.tool-page{max-width:900px;margin:0 auto;padding:32px}
+
+.tool-header{padding:32px 0 24px}
+.tool-header .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:var(--surface);font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:16px;border:1px solid var(--border)}
+.tool-header h1{font-size:32px;font-weight:700;margin-bottom:8px;letter-spacing:-0.5px}
+.tool-header p{color:var(--text-secondary);font-size:15px;max-width:560px}
+.tool-meta{display:flex;gap:16px;margin-top:16px}
+.tool-meta .tag{display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;font-size:13px;font-weight:600}
+.tool-meta .tag.credit{background:var(--green-bg);color:var(--green)}
+
+.options{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:20px}
+.options h3{font-size:14px;font-weight:600;margin-bottom:14px;color:var(--text-secondary)}
+.options-row{display:flex;gap:12px;flex-wrap:wrap}
+.option-btn{padding:8px 16px;border-radius:8px;border:1px solid var(--border);background:var(--bg);font-size:13px;font-weight:500;color:var(--text-secondary);cursor:pointer;transition:all .2s}
+.option-btn:hover{border-color:var(--accent-light);color:var(--accent)}
+.option-btn.active{background:rgba(109,40,217,0.08);border-color:var(--accent-light);color:var(--accent);font-weight:600}
+
+.editor{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:20px}
+.editor-toolbar{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;background:var(--surface);border-bottom:1px solid var(--border)}
+.editor-toolbar .label{font-size:13px;font-weight:600;color:var(--text-secondary)}
+.editor input,.editor textarea{width:100%;padding:14px 20px;border:none;outline:none;font-size:15px;color:var(--text);font-family:inherit}
+.editor textarea{min-height:100px;resize:vertical}
+
+.action-bar{display:flex;gap:12px;align-items:center;margin-bottom:20px}
+.run-btn{padding:14px 36px;border-radius:10px;background:var(--accent-gradient);color:#fff;font-size:16px;font-weight:600;border:none;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:8px;box-shadow:0 2px 8px rgba(109,40,217,0.25)}
+.run-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(109,40,217,0.35)}
+.run-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none}
+.action-hint{font-size:13px;color:var(--text-muted)}
+
+.output-area{display:none}
+.output-area.show{display:block}
+
+/* Title Cards */
+.title-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:12px;cursor:pointer;transition:all .2s}
+.title-card:hover{border-color:var(--accent-light);box-shadow:var(--shadow)}
+.title-card .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.title-card .rank{font-size:14px;font-weight:700;color:var(--accent);background:rgba(109,40,217,0.08);padding:4px 12px;border-radius:6px}
+.title-card .score{font-size:13px;color:var(--green);font-weight:600}
+.title-card .title-text{font-size:16px;font-weight:600;line-height:1.5;margin-bottom:8px}
+.title-card .meta{display:flex;gap:16px;font-size:12px;color:var(--text-muted)}
+.title-card .meta span{display:flex;align-items:center;gap:4px}
+
+.output-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.output-header h3{font-size:16px;font-weight:700}
+
+.footer{border-top:1px solid var(--border);padding:48px 32px;text-align:center;color:var(--text-muted);font-size:14px;margin-top:60px}
+
+@media(max-width:768px){
+ .tool-page{padding:20px}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+ <div class="nav-inner">
+ <a href="../index
+
+oggle" onclick="toggleReview()">
+ <span data-zh="查看评测">查看评测</span> <span id="reviewArrow">▼</span>
+</button>
+<div class="review-content" id="reviewContent">
+ <div class="review-card">
+ <div class="review-header">
+ <h3 data-zh="六维度评测"> 六维度评测</h3>
+ <span class="review-score-badge rare" data-zh="总分: 84 — 优秀">Score: 84 — Rare</span>
+ </div>
+ <div class="review-dimensions">
+ <div class="review-dim">
+ <span class="review-dim-label" data-zh="易用性">Ease</span>
+ <div class="review-dim-bar"><div class="review-dim-fill" style="width:92%"></div></div>
+ <span class="review-dim-score">92</span>
+ </div>
+ <div class="review-dim">
+ <span class="review-dim-label" data-zh="性价比">Value</span>
+ <div class="review-dim-bar"><div class="review-dim-fill" style="width:88%"></div></div>
+ <span class="review-dim-score">88</span>
+ </div>
+ <div class="review-dim">
+ <span class="review-dim-label" data-zh="模型质量">Quality</span>
+ <div class="review-dim-bar"><div class="review-dim-fill" style="width:85%"></div></div>
+ <span class="review-dim-score">85</span>
+ </div>
+ <div class="review-dim">
+ <span class="review-dim-label" data-zh="生态集成">Ecosystem</span>
+ <div class="review-dim-bar"><div class="review-dim-fill" style="width:60%"></div></div>
+ <span class="review-dim-score">60</span>
+ </div>
+ <div class="review-dim">
+ <span class="review-dim-label" data-zh="创新性">Innovation</span>
+ <div class="review-dim-bar"><div class="review-dim-fill" style="width:72%"></div></div>
+ <span class="review-dim-score">72</span>
+ </div>
+ <div class="review-dim">
+ <span class="review-dim-label" data-zh="人味">Human</span>
+ <div class="review-dim-bar"><div class="review-dim-fill" style="width:90%"></div></div>
+ <span class="review-dim-score">90</span>
+ </div>
+ </div>
+ <div class="review-summary">
+ <p data-zh="SEO标题生成效果优秀，易用性高。人味表现良好，但与其他工具的集成能力有限。">SEO标题生成效果优秀，易用性高。人味表现良好，但与其他工具的集成能力有限。</p>
+ <a href="../discover
+</script>
+
+<footer class="footer">
+ <p data-zh="© 2026 AIHues · 发现你的 AI vibe · 基于 Kimi 构建" data-en="© 2026 AIHues · Find your AI vibe · Built on Kimi">© 2026 AIHues · Find your AI vibe · Built on Kimi</p>
+</footer>
+
+<script>
+let currentIntent = 'informational', currentStyle = 'list';
+
+function setIntent(btn){ document
+
+function generate(){
+ const topic = document
+ 
+ const btn = document</span>
+ <span class="score" data-zh="CTR ${t%">CTR ${t</div>
+ <div class="meta">
+ <span data-zh="${t chars"> ${t 词" data-en=" ${t words</span>
+ <span data-zh="${t">${t That Will Change How You Work`,score:8.7,length:58,words:10,style:'Listicle',styleZh:'清单体'},
+ {text:`How to Choose the Right ${toTitleCase(topic)} (Complete Guide)`,score:9.2,length:56,words:9,style:'How-To',styleZh:'教程'},
+ {text:`Why ${toTitleCase(topic)} Matters More Than Ever in 2026`,score:7.8,length:52,words:9,style:'Bold',styleZh:'断言'},
+ {text:`${toTitleCase(topic)}: A Comprehensive Review & Comparison`,score:8.1,length:54,words:7,style:'Commercial',styleZh:'商业'},
+ {text:`The Ultimate ${toTitleCase(topic)} Guide for Beginners`,score:8.9,length:49,words:7,style:'Guide',styleZh:'指南'},
+ {text:`We Tested ${toTitleCase(topic)} — Here Are Our Top Picks`,score:9.5,length:51,words:9,style:'Testimonial',styleZh:'推荐'},
+ {text:`${toTitleCase(topic)} vs Traditional Methods: What's Better?`,score:8.3,length:54,words:7,style:'Comparison',styleZh:'对比'},
+ {text:`Stop Wasting Time: Use ${toTitleCase(topic)} Instead`,score:7.6,length:49,words:7,style:'Bold',styleZh:'断言'},
+ {text:`Everything You Need to Know About ${toTitleCase(topic)}`,score:7.9,length:55,words:9,style:'Informational',styleZh:'信息'},
+ {text:`${toTitleCase(topic)}: Results, Pricing & Verdict [2026]`,score:8.8,length:51,words:6,style:'Commercial',styleZh:'商业'},
+ ];
+}
+
+function toTitleCase(str){
+ return str
+</script>
+<script src="../js/i18n.js"></script>
+<script src="../js/achievements.js"></script>
+</body>
+</html>

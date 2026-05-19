@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-zh="X/Twitter 帖子生成器 — AIHues">X Post Generator — AIHues</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#ffffff;--surface:#f8f9fb;--surface-hover:#f1f3f7;
+  --border:#e8ecf1;--border-hover:#d1d8e0;
+  --text:#0f172a;--text-secondary:#475569;--text-muted:#94a3b8;
+  --accent:#6d28d9;--accent-light:#8b5cf6;--accent-gradient:linear-gradient(135deg,#6d28d9,#8b5cf6);
+  --green:#059669;--green-bg:#ecfdf5;
+  --radius:14px;--radius-sm:10px;
+  --shadow:0 1px 3px rgba(0,0,0,0.04),0 4px 16px rgba(0,0,0,0.04);
+  --shadow-hover:0 4px 12px rgba(109,40,217,0.12),0 8px 32px rgba(0,0,0,0.08);
+}
+body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+
+.nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.92);backdrop-filter:blur(20px) saturate(180%);border-bottom:1px solid var(--border)}
+.nav-inner{max-width:1300px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:68px}
+.logo{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:800;color:var(--text);letter-spacing:-1px;text-decoration:none}
+.logo-mark{width:34px;height:34px;border-radius:10px;background:var(--accent-gradient);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:700;box-shadow:0 2px 8px rgba(109,40,217,0.3)}
+.nav-links{display:flex;gap:28px;align-items:center}
+.nav-links a{color:var(--text-secondary);font-size:14px;font-weight:500;transition:color .2s;text-decoration:none}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{padding:9px 20px;border-radius:10px;background:var(--accent-gradient);color:#fff;font-size:14px;font-weight:600;box-shadow:0 2px 8px rgba(109,40,217,0.25);transition:all .2s;display:flex;align-items:center;gap:6px;text-decoration:none}
+.nav-cta:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(109,40,217,0.35)}
+
+.tool-page{max-width:900px;margin:0 auto;padding:32px}
+
+.tool-header{padding:32px 0 24px}
+.tool-header .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:var(--surface);font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:16px;border:1px solid var(--border)}
+.tool-header h1{font-size:32px;font-weight:700;margin-bottom:8px;letter-spacing:-0.5px}
+.tool-header p{color:var(--text-secondary);font-size:15px;max-width:560px}
+.tool-meta{display:flex;gap:16px;margin-top:16px}
+.tool-meta .tag{display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;font-size:13px;font-weight:600}
+.tool-meta .tag.credit{background:var(--green-bg);color:var(--green)}
+
+.options{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:20px}
+.options h3{font-size:14px;font-weight:600;margin-bottom:14px;color:var(--text-secondary)}
+.options-row{display:flex;gap:12px;flex-wrap:wrap}
+.option-btn{padding:8px 16px;border-radius:8px;border:1px solid var(--border);background:var(--bg);font-size:13px;font-weight:500;color:var(--text-secondary);cursor:pointer;transition:all .2s}
+.option-btn:hover{border-color:var(--accent-light);color:var(--accent)}
+.option-btn.active{background:rgba(109,40,217,0.08);border-color:var(--accent-light);color:var(--accent);font-weight:600}
+
+.editor{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:20px}
+.editor-toolbar{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;background:var(--surface);border-bottom:1px solid var(--border)}
+.editor-toolbar .label{font-size:13px;font-weight:600;color:var(--text-secondary)}
+.editor input,.editor textarea{width:100%;padding:14px 20px;border:none;outline:none;font-size:15px;color:var(--text);font-family:inherit}
+.editor textarea{min-height:80px;resize:vertical}
+
+.action-bar{display:flex;gap:12px;align-items:center;margin-bottom:20px}
+.run-btn{padding:14px 36px;border-radius:10px;background:var(--accent-gradient);color:#fff;font-size:16px;font-weight:600;border:none;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:8px;box-shadow:0 2px 8px rgba(109,40,217,0.25)}
+.run-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(109,40,217,0.35)}
+.run-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none}
+.action-hint{font-size:13px;color:var(--text-muted)}
+
+.output-area{display:none}
+.output-area.show{display:block}
+.post-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:12px;transition:all .2s;cursor:pointer}
+.post-card:hover{border-color:var(--accent-light);box-shadow:var(--shadow)}
+.post-card .head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.post-card .avatar{width:36px;height:36px;border-radius:50%;background:var(--accent-gradient);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700}
+.post-card .name{font-size:14px;font-weight:700}
+.post-card .handle{font-size:13px;color:var(--text-muted)}
+.post-card .text{font-size:15px;line-height:1.6;margin-bottom:12px;white-space:pre-wrap;word-break:break-word}
+.post-card .actions{display:flex;gap:20px;font-size:13px;color:var(--text-muted)}
+.post-card .actions span{display:flex;align-items:center;gap:4px}
+.post-card .meta{font-size:12px;color:var(--accent);font-weight:600;margin-top:8px}
+
+.output-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.output-header h3{font-size:16px;font-weight:700}
+.output-actions{display:flex;gap:8px}
+.output-actions button{padding:8px 16px;border-radius:6px;font-size:13px;font-weight:600;border:1px solid var(--border);background:var(--bg);color:var(--text-secondary);cursor:pointer;transition:all .2s}
+.output-actions button:hover{border-color:var(--accent-light);color:var(--accent)}
+
+.footer{border-top:1px solid var(--border);padding:48px 32px;text-align:center;color:var(--text-muted);font-size:14px;margin-top:60px}
+
+@media(max-width:768px){
+  .tool-page{padding:20px}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="../index
+
+oggle" onclick="toggleReview()">
+  <span data-zh="查看评测">查看评测</span> <span id="reviewArrow">▼</span>
+</button>
+<div class="review-content" id="reviewContent">
+  <div class="review-card">
+    <div class="review-header">
+      <h3 data-zh="六维度评测"> 六维度评测</h3>
+      <span class="review-score-badge rare" data-zh="总分: 82 — 优秀">Score: 82 — Rare</span>
+    </div>
+    <div class="review-dimensions">
+      <div class="review-dim">
+        <span class="review-dim-label" data-zh="易用性">Ease</span>
+        <div class="review-dim-bar"><div class="review-dim-fill" style="width:90%"></div></div>
+        <span class="review-dim-score">90</span>
+      </div>
+      <div class="review-dim">
+        <span class="review-dim-label" data-zh="性价比">Value</span>
+        <div class="review-dim-bar"><div class="review-dim-fill" style="width:85%"></div></div>
+        <span class="review-dim-score">85</span>
+      </div>
+      <div class="review-dim">
+        <span class="review-dim-label" data-zh="模型质量">Quality</span>
+        <div class="review-dim-bar"><div class="review-dim-fill" style="width:80%"></div></div>
+        <span class="review-dim-score">80</span>
+      </div>
+      <div class="review-dim">
+        <span class="review-dim-label" data-zh="生态集成">Ecosystem</span>
+        <div class="review-dim-bar"><div class="review-dim-fill" style="width:65%"></div></div>
+        <span class="review-dim-score">65</span>
+      </div>
+      <div class="review-dim">
+        <span class="review-dim-label" data-zh="创新性">Innovation</span>
+        <div class="review-dim-bar"><div class="review-dim-fill" style="width:70%"></div></div>
+        <span class="review-dim-score">70</span>
+      </div>
+      <div class="review-dim">
+        <span class="review-dim-label" data-zh="人味">Human</span>
+        <div class="review-dim-bar"><div class="review-dim-fill" style="width:88%"></div></div>
+        <span class="review-dim-score">88</span>
+      </div>
+    </div>
+    <div class="review-summary">
+      <p data-zh="社交媒体帖子生成利器，人味表现突出。适合快速生成 viral 内容，但生态集成度较弱。">社交媒体帖子生成利器，人味表现突出。适合快速生成 viral 内容，但生态集成度较弱。</p>
+      <a href="../discover
+</script>
+
+<footer class="footer">
+  <p data-zh="© 2026 AIHues · 找到你的 AI 氛围 · 基于 Kimi 构建">© 2026 AIHues · Find your AI vibe · Built on Kimi</p>
+</footer>
+
+<script>
+let currentFormat = 'single', currentTone = 'bold';
+
+function setFormat(btn){ document
+
+function generate(){
+  const topic = document
+  
+  const btn = document)">
+        <div class="head">
+          <div class="avatar">${String</div><div class="handle">@AIHues</div></div>
+        </div>
+        <div class="text">${p}</div>
+        <div class="actions">
+          </div>
+        <div class="meta">Click to copy • ${p is about having the best model.\n\nIt's not.\n\nIt's about having the best workflow.\n\nThe teams that win are the ones who iterate 10x faster than everyone else.`,
+    `Hot take: ${topic.\n\nHere's what actually worked:\n\n1. Start with one use case\n2. Measure everything\n3. Iterate weekly\n4. Don't chase the hype\n\nSimple. But most people skip step 1.`
+  ];
+}
+
+function copyPost(i){
+  const texts = document
+}
+function copyAll(){
+  const all = Array ---\n${t.textContent}`).join('\n\n');
+  navigator.clipboard.writeText(all);
+  alert(window._t?.('All posts copied!') || 'All posts copied!');
+}
+</script>
+<script src="../js/i18n.js"></script>
+<script src="../js/achievements.js"></script>
+</body>
+</html>
