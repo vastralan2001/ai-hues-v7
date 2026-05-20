@@ -71,7 +71,7 @@ a{color:var(--accent);text-decoration:none}
 .rank-table thead th:last-child{border-radius:0 var(--radius-sm) 0 0}
 .rank-table tbody td{padding:14px 16px;font-size:14px;border-bottom:1px solid var(--border);transition:all .2s}
 .rank-table tbody td:first-child{padding-left:20px}
-.rank-table tbody tr{transition:all .2s}
+.rank-table tbody tr{transition:all .2s;cursor:pointer}
 .rank-table tbody tr:hover td{background:var(--surface-hover)}
 .rank-table tbody tr:hover{transform:scale(1.005)}
 
@@ -263,7 +263,7 @@ a{color:var(--accent);text-decoration:none}
     <div class="footer-top">
       <div class="footer-brand">
         <div class="logo"><div class="logo-mark">H</div><span>AIHues</span></div>
-        <p data-zh="找到你的 AI vibe。17款工具 + 3款游戏，像人一样自然。">Find your AI vibe. 17 tools + 3 games<br>that feel human.</p>
+        <p data-zh="找到你的 AI vibe。57款工具 + 3款游戏，像人一样自然。">Find your AI vibe. 57 tools + 3 games<br>that feel human.</p>
       </div>
       <div class="footer-links">
         <div class="footer-col">
@@ -294,21 +294,21 @@ a{color:var(--accent);text-decoration:none}
 <script>
 // ===== DATA =====
 const toolRanks = [
-  {rank:1,name:'JSON 格式化',uses:'12.5K',rating:'4.9',cat:'developer'},
-  {rank:2,name:'JWT 解析器',uses:'9.8K',rating:'4.8',cat:'developer'},
-  {rank:3,name:'字数统计',uses:'8.2K',rating:'4.8',cat:'writing'},
-  {rank:4,name:'Base64 编解码',uses:'7.1K',rating:'4.7',cat:'developer'},
-  {rank:5,name:'正则测试器',uses:'6.5K',rating:'4.7',cat:'developer'},
-  {rank:6,name:'日历幸运签',uses:'5.9K',rating:'4.9',cat:'games'},
-  {rank:7,name:'二维码生成',uses:'5.3K',rating:'4.6',cat:'growth'},
-  {rank:8,name:'时间戳转换',uses:'4.8K',rating:'4.7',cat:'developer'},
-  {rank:9,name:'Markdown 预览',uses:'4.2K',rating:'4.6',cat:'writing'},
-  {rank:10,name:'投篮挑战',uses:'3.9K',rating:'4.8',cat:'games'},
-  {rank:11,name:'UUID 生成器',uses:'3.5K',rating:'4.5',cat:'developer'},
-  {rank:12,name:'Diff 文本对比',uses:'3.1K',rating:'4.6',cat:'writing'},
-  {rank:13,name:'SHA256 哈希',uses:'2.8K',rating:'4.5',cat:'developer'},
-  {rank:14,name:'老虎机',uses:'2.5K',rating:'4.7',cat:'games'},
-  {rank:15,name:'全角半角转换',uses:'1.9K',rating:'4.4',cat:'writing'},
+  {rank:1,name:'JSON 格式化',uses:'12.5K',rating:'4.9',cat:'developer',url:'tools/json.html'},
+  {rank:2,name:'JWT 解析器',uses:'9.8K',rating:'4.8',cat:'developer',url:'tools/jwt.html'},
+  {rank:3,name:'字数统计',uses:'8.2K',rating:'4.8',cat:'writing',url:'tools/word-count.html'},
+  {rank:4,name:'Base64 编解码',uses:'7.1K',rating:'4.7',cat:'developer',url:'tools/base64.html'},
+  {rank:5,name:'正则测试器',uses:'6.5K',rating:'4.7',cat:'developer',url:'tools/regex.html'},
+  {rank:6,name:'日历幸运签',uses:'5.9K',rating:'4.9',cat:'games',url:'games/daily-luck.html'},
+  {rank:7,name:'二维码生成',uses:'5.3K',rating:'4.6',cat:'growth',url:'tools/qrcode.html'},
+  {rank:8,name:'时间戳转换',uses:'4.8K',rating:'4.7',cat:'developer',url:'tools/timestamp.html'},
+  {rank:9,name:'Markdown 预览',uses:'4.2K',rating:'4.6',cat:'writing',url:'tools/markdown.html'},
+  {rank:10,name:'投篮挑战',uses:'3.9K',rating:'4.8',cat:'games',url:'games/basketball.html'},
+  {rank:11,name:'UUID 生成器',uses:'3.5K',rating:'4.5',cat:'developer',url:'tools/uuid.html'},
+  {rank:12,name:'Diff 文本对比',uses:'3.1K',rating:'4.6',cat:'writing',url:'tools/diff.html'},
+  {rank:13,name:'SHA256 哈希',uses:'2.8K',rating:'4.5',cat:'developer',url:'tools/sha256.html'},
+  {rank:14,name:'老虎机',uses:'2.5K',rating:'4.7',cat:'games',url:'games/slot-machine.html'},
+  {rank:15,name:'全角半角转换',uses:'1.9K',rating:'4.4',cat:'writing',url:'tools/fullwidth.html'},
 ];
 
 const userRanks = [
@@ -349,7 +349,7 @@ function renderToolRanks(){
     else if(t.rank===2) rankCell='<span class="medal medal-silver">\uD83E\uDD48</span>';
     else if(t.rank===3) rankCell='<span class="medal medal-bronze">\uD83E\uDD49</span>';
     else rankCell='<span class="rank-num-plain">#'+t.rank+'</span>';
-    return '<tr><td>'+rankCell+'</td><td class="tool-name">'+t.name+'</td><td style="font-weight:600;color:var(--text-secondary)">'+t.uses+'</td><td><span class="rating">'+starSvg+' '+t.rating+'</span></td><td><span class="tool-cat '+catClass[t.cat]+'">'+catLabels[t.cat]+'</span></td></tr>';
+    return '<tr class="rank-row" onclick="window.location=\''+t.url+'\'"><td>'+rankCell+'</td><td class="tool-name">'+t.name+'</td><td style="font-weight:600;color:var(--text-secondary)">'+t.uses+'</td><td><span class="rating">'+starSvg+' '+t.rating+'</span></td><td><span class="tool-cat '+catClass[t.cat]+'">'+catLabels[t.cat]+'</span></td></tr>';
   }).join('');
 }
 
