@@ -61,6 +61,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,Bl
 
 .footer{border-top:1px solid var(--border);padding:48px 32px;text-align:center;color:var(--text-muted);font-size:14px;margin-top:60px}
 </style>
+<link rel="manifest" href="/manifest.json">
 </head>
 <body>
 
@@ -208,18 +209,22 @@ Closes #234`;
 
 function runTool(){
   const input = document.getElementById('input').value.trim();
-  if(!input){ alert('Please enter some content'); return; }
-  
+  if(!input){ alert('Please describe your changes'); return; }
   const btn = document.getElementById('runBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<span>⏳</span> Processing...';
-  
+  btn.disabled = true; btn.innerHTML = '<span>⏳</span> Processing...';
   setTimeout(() => {
-    document.getElementById('output').textContent = demoOutput;
+    const types = [
+      {p:'feat',d:'A new feature'},{p:'fix',d:'A bug fix'},{p:'docs',d:'Documentation'},
+      {p:'style',d:'Code style'},{p:'refactor',d:'Code refactoring'},{p:'test',d:'Adding tests'},{p:'chore',d:'Build/tool changes'}
+    ];
+    const shortMsg = input.length > 50 ? input.substring(0,47) + '...' : input;
+    let out = "## Git Commit Messages\n\n";
+    types.forEach((t,i) => { out += (i+1) + ". `" + t.p + ": " + shortMsg.toLowerCase() + "` — " + t.d + "\n"; });
+    out += "\n### Conventional Commit\n```\n" + types[0].p + ": " + shortMsg + "\n\n" + input.substring(0,200) + (input.length > 200 ? '...' : '') + "\n```\n\n[Pick the type that best describes your changes]";
+    document.getElementById('output').textContent = out;
     document.getElementById('outputArea').classList.add('show');
-    btn.disabled = false;
-    btn.innerHTML = 'Regenerate';
-  }, 1200);
+    btn.disabled = false; btn.innerHTML = 'Regenerate';
+  }, 800);
 }
 
 function copyOutput(){
@@ -241,5 +246,15 @@ document.getElementById('input').addEventListener('input', function(){
 });
 </script>
 
+<script src="../js/i18n.js"></script>
+
+<script>
+// Register Service Worker for offline support
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js')
+    .then(reg => console.log('SW registered:', reg.scope))
+    .catch(err => console.log('SW registration failed:', err));
+}
+</script>
 </body>
 </html>

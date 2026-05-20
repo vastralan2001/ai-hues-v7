@@ -124,6 +124,7 @@
       .stats-bar{grid-template-columns:repeat(2,1fr)}
     }
   </style>
+<link rel="manifest" href="/manifest.json">
 </head>
 <body>
 
@@ -561,5 +562,14 @@
       }
     });
   </script>
+
+<script>
+// Register Service Worker for offline support
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js')
+    .then(reg => console.log('SW registered:', reg.scope))
+    .catch(err => console.log('SW registration failed:', err));
+}
+</script>
 </body>
 </html>

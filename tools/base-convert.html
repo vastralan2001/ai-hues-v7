@@ -146,6 +146,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   .mode-tab{flex:1;text-align:center;padding:10px 12px}
 }
 </style>
+<link rel="manifest" href="/manifest.json">
 </head>
 <body>
 
@@ -655,5 +656,14 @@ function showToast(msg){
 }
 </script>
 <script src="../js/i18n.js"></script>
+
+<script>
+// Register Service Worker for offline support
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js')
+    .then(reg => console.log('SW registered:', reg.scope))
+    .catch(err => console.log('SW registration failed:', err));
+}
+</script>
 </body>
 </html>

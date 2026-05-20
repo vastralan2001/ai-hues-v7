@@ -61,6 +61,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,Bl
 
 .footer{border-top:1px solid var(--border);padding:48px 32px;text-align:center;color:var(--text-muted);font-size:14px;margin-top:60px}
 </style>
+<link rel="manifest" href="/manifest.json">
 </head>
 <body>
 
@@ -209,18 +210,21 @@ const demoOutput = `**Alt Text (Descriptive):**
 
 function runTool(){
   const input = document.getElementById('input').value.trim();
-  if(!input){ alert('Please enter some content'); return; }
-  
+  if(!input){ alert('Please describe the image'); return; }
   const btn = document.getElementById('runBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<span>⏳</span> Processing...';
-  
+  btn.disabled = true; btn.innerHTML = '<span>⏳</span> Processing...';
   setTimeout(() => {
-    document.getElementById('output').textContent = demoOutput;
+    const short = input.length > 100 ? input.substring(0,97) + '...' : input;
+    let out = "## Alt Text Suggestions\n\n";
+    out += "### Short (for icons)\n`" + short.split(' ').slice(0,5).join(' ') + "`\n\n";
+    out += "### Medium (for content images)\n`" + short.split(' ').slice(0,15).join(' ') + "`\n\n";
+    out += "### Descriptive (for complex images)\n`" + short + "`\n\n";
+    out += "### SEO-optimized\n`" + input.substring(0,125) + "`\n\n";
+    out += "### Tips\n- Keep under 125 characters\n- Don't start with 'Image of'\n- Include relevant keywords\n\n[Full AI generation requires API]";
+    document.getElementById('output').textContent = out;
     document.getElementById('outputArea').classList.add('show');
-    btn.disabled = false;
-    btn.innerHTML = 'Regenerate';
-  }, 1200);
+    btn.disabled = false; btn.innerHTML = 'Regenerate';
+  }, 800);
 }
 
 function copyOutput(){
@@ -242,5 +246,15 @@ document.getElementById('input').addEventListener('input', function(){
 });
 </script>
 
+<script src="../js/i18n.js"></script>
+
+<script>
+// Register Service Worker for offline support
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js')
+    .then(reg => console.log('SW registered:', reg.scope))
+    .catch(err => console.log('SW registration failed:', err));
+}
+</script>
 </body>
 </html>

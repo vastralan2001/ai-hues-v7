@@ -73,6 +73,8 @@ a{color:var(--accent);text-decoration:none}
 /* FOOTER */
 .footer{border-top:1px solid var(--border);padding:32px;text-align:center;color:var(--text-muted);font-size:13px}
 </style>
+<link rel="stylesheet" href="css/themes.css">
+<link rel="manifest" href="/manifest.json">
 </head>
 <body>
 
@@ -91,26 +93,26 @@ a{color:var(--accent);text-decoration:none}
 
 <section class="hero">
  <h1><span data-zh="全部">All </span><span class="gradient" data-zh="工具">Tools</span></h1>
- <p data-zh="48 个工具，覆盖开发、写作、增长、效率四大场景">48 tools covering development, writing, growth, and productivity</p>
+ <p data-zh="52 个工具，覆盖开发、写作、增长、效率四大场景">57 tools covering development, writing, growth, and productivity</p>
  <div class="search-wrap">
  <div class="search-box">
- <input type="text" id="searchInput" placeholder="Search 48 tools..." data-zh-placeholder="搜索 48 个工具..." oninput="filterTools(this.value)">
+ <input type="text" id="searchInput" placeholder="Search 57 tools..." data-zh-placeholder="搜索 52 个工具..." oninput="filterTools(this.value)">
  </div>
  </div>
 </section>
 
 <div class="count-bar">
- <div class="count-item">🛠️ <b>18</b> <span data-zh="开发工具">Dev Tools</span></div>
- <div class="count-item">✍️ <b>7</b> <span data-zh="写作工具">Writing</span></div>
+ <div class="count-item">🛠️ <b>32</b> <span data-zh="开发工具">Dev Tools</span></div>
+ <div class="count-item">✍️ <b>24</b> <span data-zh="写作工具">Writing</span></div>
  <div class="count-item">📈 <b>3</b> <span data-zh="增长工具">Growth</span></div>
  <div class="count-item">⚡ <b>1</b> <span data-zh="效率工具">Productivity</span></div>
  <div class="count-item">🤖 <b>29</b> <span data-zh="AI文本工具">AI Writing</span></div>
- <div class="count-item" style="margin-left:auto">📊 <b>48</b> <span data-zh="总计">Total</span></div>
+ <div class="count-item" style="margin-left:auto">📊 <b>57</b> <span data-zh="总计">Total</span></div>
 </div>
 
 <!-- DEV TOOLS -->
 <section class="section">
- <div class="section-header"><span class="section-icon">🛠️</span><span class="section-title" data-zh="开发工具">Developer Tools</span><span class="section-count">18 tools</span></div>
+ <div class="section-header"><span class="section-icon">🛠️</span><span class="section-title" data-zh="开发工具">Developer Tools</span><span class="section-count">224 tools</span></div>
  <div class="tools-grid" id="devGrid">
  <a href="tools/jwt.html" class="tool-card"><span class="badge-new">NEW</span><div class="icon">🔐</div><h3>JWT Parser</h3><p data-zh="解析JWT令牌">Parse JWT tokens</p></a>
  <a href="tools/json.html" class="tool-card"><span class="badge-new">NEW</span><div class="icon">📋</div><h3>JSON Formatter</h3><p data-zh="格式化JSON">Format & validate JSON</p></a>
@@ -130,13 +132,26 @@ a{color:var(--accent);text-decoration:none}
  <a href="tools/code-review.html" class="tool-card"><div class="icon">👁️</div><h3>Code Review</h3><p data-zh="代码审查">Review code</p></a>
  <a href="tools/shell.html" class="tool-card"><div class="icon">🐚</div><h3>Shell Gen</h3><p data-zh="Shell命令生成">Generate shell commands</p></a>
  <a href="tools/git-commit.html" class="tool-card"><div class="icon">📌</div><h3>Git Commit</h3><p data-zh="Git提交信息">Git commit messages</p></a>
- </div>
+  <a href="tools/ip-lookup.html" class="tool-card"><span class="badge-new">NEW</span><div class="icon">🔍</div><h3>IP Lookup</h3><p data-zh="IP地理位置查询">IP geolocation lookup</p></a>
+ <a href="tools/curl-gen.html" class="tool-card"><span class="badge-new">NEW</span><div class="icon">🌐</div><h3>Curl Gen</h3><p data-zh="生成curl命令">Generate curl commands</p></a>
+ <a href="tools/lorem-ipsum.html" class="tool-card"><span class="badge-new">NEW</span><div class="icon">📝</div><h3>Lorem Ipsum</h3><p data-zh="随机文本生成器">Random text generator</p></a>
+ <a href="tools/diff-pro.html" class="tool-card"><span class="badge-new">NEW</span><div class="icon">📑</div><h3>Diff Pro</h3><p data-zh="高级文本差异对比">Advanced text diff</p></a>
+ <a href="tools/unit-convert.html" class="tool-card"><span class="badge-new">NEW</span><div class="icon">📐</div><h3>Unit Convert</h3><p data-zh="长度/重量/温度/面积转换">Unit converter</p></a>
+</div>
 </section>
 
 <!-- WRITING TOOLS -->
 <section class="section" style="background:var(--surface);border-top:1px solid var(--border)">
- <div class="section-header"><span class="section-icon">✍️</span><span class="section-title" data-zh="写作工具">Writing Tools</span><span class="section-count">7 tools</span></div>
- <div class="tools-grid" id="writeGrid">
+ <div class="section-header"><span class="section-icon">✍️</span><span class="section-title" data-zh="写作工具">Writing Tools</span><span class="section-count">24 tools</span></div>
+  <a href="tools/image-to-base64.html" class="tool-card"><span class="badge-new">NEW</span><div class="icon">🖼️</div><h3>Image → Base64</h3><p data-zh="图片转Base64">Image to Base64</p></a>
+ <a href="tools/css-gradient.html" class="tool-card"><span class="badge-new">NEW</span><div class="icon">🌈</div><h3>CSS Gradient</h3><p data-zh="CSS渐变生成">CSS gradient gen</p></a>
+ <a href="tools/color-convert.html" class="tool-card"><span class="badge-new">NEW</span><div class="icon">🎨</div><h3>Color Converter</h3><p data-zh="色值转换">HEX/RGB/HSL/CMYK</p></a>
+ <a href="tools/csv-json.html" class="tool-card"><span class="badge-new">NEW</span><div class="icon">📊</div><h3>CSV ↔ JSON</h3><p data-zh="CSV转JSON">CSV/JSON convert</p></a>
+ </div>
+</section>
+
+<!-- WRITING TOOLS -->
+<div class="tools-grid" id="writeGrid">
  <a href="tools/word-count.html" class="tool-card"><div class="icon">📊</div><h3>Word Counter</h3><p data-zh="字数统计">Word & char count</p></a>
  <a href="tools/diff.html" class="tool-card"><div class="icon">📑</div><h3>Diff Checker</h3><p data-zh="文本对比">Compare text diffs</p></a>
  <a href="tools/markdown.html" class="tool-card"><span class="badge-new">NEW</span><div class="icon">📝</div><h3>Markdown</h3><p data-zh="Markdown预览">Live MD preview</p></a>
@@ -205,6 +220,18 @@ function filterTools(query){
   const text=(el.textContent||'').toLowerCase();
   el.style.display=(!q||text.includes(q))?'':'none';
  });
+}
+</script>
+<script src="js/i18n.js"></script>
+<script src="js/theme-system.js"></script>
+<script src="js/achievements.js"></script>
+
+<script>
+// Register Service Worker for offline support
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js')
+    .then(reg => console.log('SW registered:', reg.scope))
+    .catch(err => console.log('SW registration failed:', err));
 }
 </script>
 </body>

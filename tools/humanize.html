@@ -112,6 +112,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,Bl
 .review-content.show{display:block}
 @media(max-width:768px){.review-dim-label{width:60px;font-size:12px}.review-dim-score{font-size:12px}}
 </style>
+<link rel="manifest" href="/manifest.json">
 </head>
 <body>
 
@@ -143,7 +144,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,Bl
   <div class="presets">
     <h3 data-zh="快速预设">Quick Presets</h3>
     <div class="preset-grid">
-      <button class="preset-btn" onclick="loadPreset('formal')">
+      <button class="preset-btn" onclick="humanize()">
         <span class="title" data-zh="正式邮件"> Formal Email</span>
         <span class="desc" data-zh="商务专业风格">Professional business tone</span>
       </button>
@@ -297,29 +298,28 @@ function updateCount(){
 
 document.getElementById('input').addEventListener('input', updateCount);
 
-function humanize(){
+function runTool(){
   const input = document.getElementById('input').value.trim();
-  if(!input){ alert('Please enter some text to humanize'); return; }
-  
-  const btn = document.getElementById('runBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<span>⏳</span> Processing...';
-  
+  if(!input){ alert('Please enter AI-generated text'); return; }
+  const btn = document.getElementById('runBtn'); if(!btn) { humanize(); return; }
+  btn.disabled = true; btn.innerHTML = '<span>⏳</span> Processing...';
   setTimeout(() => {
-    const demoOutputs = {
-      natural: `Hi there,\n\nI wanted to reach out about the Q2 roadmap review. Our analytics tool has gotten a lot better at predicting conversions — about 34% better, actually.\n\nAre you free for a quick chat next Tuesday? Let me know what works!`,
-      professional: `Dear Team,\n\nI am writing to inform you of significant improvements in our analytics platform. Conversion prediction accuracy has increased by 34% in recent benchmarks.\n\nI would welcome the opportunity to discuss these findings in our upcoming Q2 roadmap review. Please advise your availability for Tuesday.`,
-      casual: `Hey team!\n\nQuick update — our AI analytics thing is *crushing* it. Conversion predictions are up 34% which is honestly kind of insane.\n\nWanna grab some time Tuesday to go through the Q2 roadmap? LMK what works!`,
-      witty: `Hello,\n\nPlot twist: our AI can now predict conversions 34% better than before. Turns out teaching machines to read minds works better than expected.\n\nRoadmap review next Tuesday? Bring coffee and your best ideas.`,
-      academic: `Colleagues,\n\nThis correspondence serves to report statistically significant improvements in our machine learning analytics platform. Empirical testing demonstrates a 34% increase in conversion prediction fidelity.\n\nI propose convening on Tuesday to evaluate Q2 strategic priorities. Please confirm your availability at your earliest convenience.`
-    };
-    
-    document.getElementById('output').textContent = demoOutputs[currentTone] || demoOutputs.natural;
+    const replacements = [
+      {from:/utilize/g,to:'use'},{from:/leverage/g,to:'use'},{from:/facilitate/g,to:'help'},
+      {from:/implementation/g,to:'using'},{from:/optimization/g,to:'improving'},{from:/synergy/g,to:'working together'},
+      {from:/holistic/g,to:'complete'},{from:/robust/g,to:'strong'},{from:/scalable/g,to:'grows well'},
+      {from:/seamless/g,to:'smooth'},{from:/cutting-edge/g,to:'new'},{from:/innovative/g,to:'new'},
+      {from:/is designed to/g,to:''},{from:/in order to/g,to:'to'},{from:/at this point in time/g,to:'now'}
+    ];
+    let humanized = input; let changed = 0;
+    replacements.forEach(r => { const before = humanized; humanized = humanized.replace(r.from, r.to); if(humanized !== before) changed++; });
+    let out = "## Humanized Text\n\n**Replacements**: " + changed + "\n\n" + humanized + "\n\n";
+    if(changed === 0) out += "✅ Text already looks natural!\n"; else out += "⚡ Removed " + changed + " buzzword(s).\n";
+    out += "\n[Full AI humanization requires API]";
+    document.getElementById('output').textContent = out;
     document.getElementById('outputArea').classList.add('show');
-    btn.disabled = false;
-    btn.innerHTML = 'Humanize Again';
-    recordToolUse('humanize', 1);
-  }, 1200);
+    btn.disabled = false; btn.innerHTML = 'Regenerate';
+  }, 800);
 }
 
 function copyOutput(){
@@ -338,5 +338,14 @@ function downloadOutput(){
 </script>
 <script src="../js/i18n.js"></script>
 <script src="../js/achievements.js"></script>
+
+<script>
+// Register Service Worker for offline support
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js')
+    .then(reg => console.log('SW registered:', reg.scope))
+    .catch(err => console.log('SW registration failed:', err));
+}
+</script>
 </body>
 </html>

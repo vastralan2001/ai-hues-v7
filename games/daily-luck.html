@@ -472,6 +472,8 @@ main{position:relative;z-index:1;min-height:calc(100vh - 60px)}
   .fortune-level{font-size:32px}
 }
 </style>
+<link rel="stylesheet" href="../css/themes.css">
+<link rel="manifest" href="/manifest.json">
 </head>
 <body>
 
@@ -690,6 +692,8 @@ main{position:relative;z-index:1;min-height:calc(100vh - 60px)}
 </div>
 
 <script src="../js/i18n.js"></script>
+<script src="../js/theme-system.js"></script>
+<script src="../js/achievements.js"></script>
 <script>
 // ===================== DATA =====================
 
@@ -1356,12 +1360,15 @@ function shareFortune() {
   }
 
   const lang = getLang();
-  const text = lang === 'zh'
-    ? `今日运势：[${currentFortune.level}] - ${currentFortune.quoteZh} 幸运色：${currentFortune.color.nameZh} ${currentFortune.color.hex} 幸运数字：${currentFortune.luckyNumber} 来自 AIHues Daily Fortune`
-    : `Today's Fortune: [${currentFortune.levelEn}] - ${currentFortune.quoteEn} Lucky Color: ${currentFortune.color.name} ${currentFortune.color.hex} Lucky Number: ${currentFortune.luckyNumber} via AIHues Daily Fortune`;
+  let text;
+  if (lang === 'zh') {
+    text = `\uD83D\uDCC5 今日运势：[${currentFortune.level}]\n\u2728 箴言：${currentFortune.quoteZh}\n\uD83C\uDFA8 幸运色：${currentFortune.color.nameZh}\n\uD83D\uDD22 幸运数字：${currentFortune.luckyNumber}\n\n来AIHues抽你的每日幸运签！\n\uD83D\uDC49 https://nptmdmptvfdmm.ok.kimi.link/games/daily-luck.html`;
+  } else {
+    text = `\uD83D\uDCC5 Today's Fortune: [${currentFortune.levelEn}]\n\u2728 Wisdom: ${currentFortune.quoteEn}\n\uD83C\uDFA8 Lucky Color: ${currentFortune.color.name}\n\uD83D\uDD22 Lucky Number: ${currentFortune.luckyNumber}\n\nDraw your daily fortune at AIHues!\n\uD83D\uDC49 https://nptmdmptvfdmm.ok.kimi.link/games/daily-luck.html`;
+  }
 
   navigator.clipboard.writeText(text).then(() => {
-    showToast(lang === 'zh' ? '已复制到剪贴板！' : 'Copied to clipboard!');
+    showToast(lang === 'zh' ? '分享文字已复制到剪贴板！' : 'Copied to clipboard!');
   }).catch(() => {
     // Fallback
     const ta = document.createElement('textarea');
@@ -1370,7 +1377,7 @@ function shareFortune() {
     ta.select();
     document.execCommand('copy');
     document.body.removeChild(ta);
-    showToast(lang === 'zh' ? '已复制到剪贴板！' : 'Copied to clipboard!');
+    showToast(lang === 'zh' ? '分享文字已复制到剪贴板！' : 'Copied to clipboard!');
   });
 }
 
@@ -1618,139 +1625,70 @@ function generateShareCard() {
 
   const canvas = document.getElementById('share-card-canvas');
   canvas.width = 600;
-  canvas.height = 800;
+  canvas.height = 700;
   const ctx = canvas.getContext('2d');
   const result = currentFortune;
 
-  // Background: deep purple gradient
-  const grad = ctx.createLinearGradient(0,0,600,800);
+  // Background - mysterious purple gradient
+  const grad = ctx.createLinearGradient(0, 0, 600, 700);
   grad.addColorStop(0, '#1a0a2e');
   grad.addColorStop(0.5, '#0f0a1e');
-  grad.addColorStop(1, '#1a1028');
+  grad.addColorStop(1, '#1a1040');
   ctx.fillStyle = grad;
-  ctx.fillRect(0,0,600,800);
+  ctx.fillRect(0, 0, 600, 700);
 
-  // Decorative circles
-  ctx.save();
-  ctx.globalAlpha = 0.08;
-  ctx.fillStyle = '#d4a843';
-  ctx.beginPath();
-  ctx.arc(100, 200, 120, 0, Math.PI*2);
-  ctx.fill();
-  ctx.beginPath();
-  ctx.arc(500, 600, 80, 0, Math.PI*2);
-  ctx.fill();
-  ctx.restore();
-
-  // Golden border (double)
-  ctx.strokeStyle = 'rgba(212,168,67,0.6)';
-  ctx.lineWidth = 2;
-  ctx.strokeRect(24,24,552,752);
+  // Golden border
   ctx.strokeStyle = '#d4a843';
   ctx.lineWidth = 3;
-  ctx.strokeRect(32,32,536,736);
+  ctx.strokeRect(20, 20, 560, 660);
 
-  // Corner ornaments
-  drawCornerOrnament(ctx, 32, 32, 1, 1);
-  drawCornerOrnament(ctx, 568, 32, -1, 1);
-  drawCornerOrnament(ctx, 32, 768, 1, -1);
-  drawCornerOrnament(ctx, 568, 768, -1, -1);
-
-  // Title
+  // Title with crystal ball
   ctx.fillStyle = '#d4a843';
-  ctx.font = 'bold 52px "Noto Serif SC", serif';
+  ctx.font = 'bold 32px "Noto Serif SC", serif';
   ctx.textAlign = 'center';
-  ctx.fillText('每日运势', 300, 130);
-  ctx.font = 'italic 18px serif';
-  ctx.fillStyle = 'rgba(212,168,67,0.5)';
-  ctx.fillText('Daily Fortune', 300, 158);
-
-  // Horizontal golden line
-  ctx.strokeStyle = 'rgba(212,168,67,0.4)';
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(120, 175); ctx.lineTo(480, 175);
-  ctx.stroke();
-
-  // Date
-  const dateStr = new Date().toLocaleDateString('zh-CN', {year:'numeric',month:'long',day:'numeric'});
-  ctx.fillStyle = '#94a3b8';
+  ctx.fillText('\uD83D\uDD2E 每日运势', 300, 100);
   ctx.font = '18px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText(dateStr, 300, 210);
+  ctx.fillStyle = '#94a3b8';
+  ctx.fillText(new Date().toLocaleDateString('zh-CN'), 300, 130);
 
   // Fortune level (large text)
-  const lvColor = (levelColors[result.level] || levelColors['大吉']).fill;
-  ctx.fillStyle = lvColor;
+  const levelColorsMap = {'大吉':'#d4a843','吉':'#8b5cf6','中吉':'#059669','小吉':'#3b82f6','平':'#94a3b8'};
+  ctx.fillStyle = levelColorsMap[result.level] || '#8b5cf6';
   ctx.font = 'bold 80px "Noto Serif SC", serif';
-  ctx.textAlign = 'center';
-  ctx.fillText(result.level, 300, 310);
-
-  // Level English name
-  ctx.fillStyle = 'rgba(255,255,255,0.4)';
-  ctx.font = '20px serif';
-  ctx.fillText(result.levelEn || '', 300, 340);
+  ctx.fillText(result.level, 300, 260);
 
   // Divider
-  ctx.strokeStyle = lvColor;
-  ctx.lineWidth = 2;
-  ctx.globalAlpha = 0.5;
+  ctx.strokeStyle = '#d4a843';
+  ctx.lineWidth = 1.5;
+  ctx.globalAlpha = 0.4;
   ctx.beginPath();
-  ctx.moveTo(180, 370); ctx.lineTo(420, 370);
+  ctx.moveTo(180, 285);
+  ctx.lineTo(420, 285);
   ctx.stroke();
   ctx.globalAlpha = 1;
 
-  // Quote with word wrap
+  // Quote (wisdom)
   ctx.fillStyle = '#e2e8f0';
-  ctx.font = '28px "Noto Serif SC", serif';
-  wrapText(ctx, result.quoteZh || result.quote || '', 300, 420, 480, 38);
-
-  // Quote English (if available)
-  if (result.quoteEn) {
-    ctx.fillStyle = 'rgba(255,255,255,0.35)';
-    ctx.font = '16px serif';
-    wrapText(ctx, result.quoteEn, 300, 480, 460, 24);
-  }
+  ctx.font = '22px "Noto Serif SC", serif';
+  wrapText(ctx, result.quoteZh || result.quote || '', 300, 330, 500, 35);
 
   // Lucky Color
-  const colorY = 560;
-  ctx.fillStyle = '#7a6a99';
-  ctx.font = '14px sans-serif';
-  ctx.textAlign = 'left';
-  ctx.fillText('幸运色 Lucky Color', 130, colorY);
-  const colorDot = result.color ? result.color.hex : '#d4a843';
-  ctx.fillStyle = colorDot;
-  ctx.fillRect(130, colorY+10, 28, 28);
-  ctx.strokeStyle = 'rgba(255,255,255,0.3)';
-  ctx.lineWidth = 1;
-  ctx.strokeRect(130, colorY+10, 28, 28);
-  ctx.fillStyle = '#e2e8f0';
+  ctx.fillStyle = '#94a3b8';
   ctx.font = '18px sans-serif';
-  ctx.textAlign = 'left';
-  ctx.fillText(result.color ? result.color.nameZh : '', 168, colorY+30);
+  ctx.fillText('\uD83C\uDFA8 幸运色: ' + (result.color ? result.color.nameZh : ''), 300, 480);
 
   // Lucky Number
-  ctx.textAlign = 'right';
-  ctx.fillStyle = '#7a6a99';
-  ctx.font = '14px sans-serif';
-  ctx.fillText('幸运数字 Lucky Number', 470, colorY);
   ctx.fillStyle = '#d4a843';
-  ctx.font = 'bold 36px sans-serif';
-  ctx.fillText(String(result.luckyNumber || ''), 470, colorY+36);
+  ctx.font = 'bold 48px sans-serif';
+  ctx.fillText(String(result.luckyNumber || ''), 300, 550);
+  ctx.font = '16px sans-serif';
+  ctx.fillStyle = '#94a3b8';
+  ctx.fillText('幸运数字', 300, 580);
 
-  // Credits earned
-  ctx.textAlign = 'center';
-  ctx.fillStyle = 'rgba(212,168,67,0.3)';
-  ctx.font = '14px sans-serif';
-  ctx.fillText('REWARD', 300, 660);
-  ctx.fillStyle = '#d4a843';
-  ctx.font = 'bold 32px sans-serif';
-  ctx.fillText('+' + (result.credits || 0) + ' Credits', 300, 690);
-
-  // AIHues Logo
+  // Bottom CTA
   ctx.fillStyle = '#8b5cf6';
   ctx.font = '16px sans-serif';
-  ctx.fillText('AIHues · Find your AI vibe', 300, 745);
+  ctx.fillText('\u6765\u62BD\u4F60\u7684\u5E78\u8FD0\u7B7E \u2192 nptmdmptvfdmm.ok.kimi.link', 300, 650);
 
   shareCardCanvasDataUrl = canvas.toDataURL('image/png');
   document.getElementById('share-modal').classList.add('active');
@@ -1825,6 +1763,15 @@ if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', init);
 } else {
   init();
+}
+</script>
+
+<script>
+// Register Service Worker for offline support
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js')
+    .then(reg => console.log('SW registered:', reg.scope))
+    .catch(err => console.log('SW registration failed:', err));
 }
 </script>
 </body>

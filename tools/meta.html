@@ -61,6 +61,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,Bl
 
 .footer{border-top:1px solid var(--border);padding:48px 32px;text-align:center;color:var(--text-muted);font-size:14px;margin-top:60px}
 </style>
+<link rel="manifest" href="/manifest.json">
 </head>
 <body>
 
@@ -202,18 +203,21 @@ const demoOutput = `Discover the top 10 AI tools for developers in 2026. Boost p
 
 function runTool(){
   const input = document.getElementById('input').value.trim();
-  if(!input){ alert('Please enter some content'); return; }
-  
+  if(!input){ alert('Please enter page content'); return; }
   const btn = document.getElementById('runBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<span>⏳</span> Processing...';
-  
+  btn.disabled = true; btn.innerHTML = '<span>⏳</span> Processing...';
   setTimeout(() => {
-    document.getElementById('output').textContent = demoOutput;
+    const title = input.length > 60 ? input.substring(0,57) + '...' : input;
+    const desc = input.length > 160 ? input.substring(0,157) + '...' : input;
+    const keywords = input.split(' ').filter(w => w.length > 3).slice(0,10).join(', ');
+    let out = "## Meta Tags\n\n**Title** (" + title.length + "/60)\n`" + title + "`\n\n";
+    out += "**Description** (" + desc.length + "/160)\n`" + desc + "`\n\n";
+    out += "**Keywords**\n`" + keywords + "`\n\n";
+    out += "### HTML\n```html\n<title>" + title + "</title>\n<meta name=\"description\" content=\"" + desc + "\">\n<meta name=\"keywords\" content=\"" + keywords + "\">\n<meta property=\"og:title\" content=\"" + title + "\">\n<meta property=\"og:description\" content=\"" + desc + "\">\n<meta name=\"twitter:title\" content=\"" + title + "\">\n```\n\n[Full AI generation requires API]";
+    document.getElementById('output').textContent = out;
     document.getElementById('outputArea').classList.add('show');
-    btn.disabled = false;
-    btn.innerHTML = 'Regenerate';
-  }, 1200);
+    btn.disabled = false; btn.innerHTML = 'Regenerate';
+  }, 800);
 }
 
 function copyOutput(){
@@ -235,5 +239,15 @@ document.getElementById('input').addEventListener('input', function(){
 });
 </script>
 
+<script src="../js/i18n.js"></script>
+
+<script>
+// Register Service Worker for offline support
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js')
+    .then(reg => console.log('SW registered:', reg.scope))
+    .catch(err => console.log('SW registration failed:', err));
+}
+</script>
 </body>
 </html>

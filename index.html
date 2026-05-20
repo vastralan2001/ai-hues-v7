@@ -16,6 +16,21 @@
  --shadow:0 1px 3px rgba(0,0,0,0.04),0 4px 16px rgba(0,0,0,0.04);
  --shadow-hover:0 4px 12px rgba(109,40,217,0.12),0 8px 32px rgba(0,0,0,0.08);
 }
+[data-theme="dark"] {
+ --bg:#0a0a12;
+ --surface:#12121f;
+ --surface-hover:#1a1a2e;
+ --border:#2a2a40;
+ --border-hover:#3a3a55;
+ --text:#e8eaf0;
+ --text-secondary:#9ca3af;
+ --text-muted:#6b7280;
+ --accent:#8b5cf6;
+ --accent-light:#a78bfa;
+ --accent-gradient:linear-gradient(135deg,#6d28d9,#8b5cf6);
+ --shadow:0 1px 3px rgba(0,0,0,0.2),0 4px 16px rgba(0,0,0,0.3);
+ --shadow-hover:0 4px 12px rgba(139,92,246,0.15),0 8px 32px rgba(0,0,0,0.4);
+}
 body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
 a{color:var(--accent);text-decoration:none}
 ::selection{background:var(--accent-light);color:#fff}
@@ -32,9 +47,22 @@ a{color:var(--accent);text-decoration:none}
 .nav-cta:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(109,40,217,0.35)}
 .lang-btn{padding:8px 16px;border-radius:8px;background:var(--surface);border:1px solid var(--border);color:var(--text-secondary);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
 .lang-btn:hover{border-color:var(--accent-light);color:var(--accent)}
+.theme-btn{width:34px;height:34px;border-radius:8px;background:var(--surface);border:1px solid var(--border);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.theme-btn:hover{border-color:var(--accent-light)}
+
+/* Dark mode specific overrides */
+[data-theme="dark"] .hero::before{background:radial-gradient(circle,rgba(109,40,217,0.1) 0%,transparent 70%)}
+[data-theme="dark"] .nav{background:rgba(10,10,18,0.92);border-bottom-color:var(--border)}
+[data-theme="dark"] .stats-bar,
+[data-theme="dark"] .games-section{background:#0e0e18}
+[data-theme="dark"] .tool-card .icon-wrap,
+[data-theme="dark"] .cat-card{background:var(--surface);border-color:var(--border)}
+[data-theme="dark"] .search-box input,
+[data-theme="dark"] .agent-box input{color:var(--text)}
 
 /* ===== HERO (compact) ===== */
-.hero{text-align:center;padding:60px 32px 32px;position:relative;overflow:hidden}
+.hero{text-align:center;padding:60px 32px 32px;position:relative;overflow:hidden;animation:fadeInUp .6s ease}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 .hero::before{content:'';position:absolute;top:-300px;left:50%;transform:translateX(-50%);width:800px;height:800px;background:radial-gradient(circle,rgba(109,40,217,0.06) 0%,transparent 70%);border-radius:50%;pointer-events:none}
 .hero-inner{max-width:680px;margin:0 auto;position:relative}
 .hero h1{font-size:48px;font-weight:800;line-height:1.08;letter-spacing:-2px;margin-bottom:10px}
@@ -185,6 +213,8 @@ a{color:var(--accent);text-decoration:none}
  .cat-section{padding:0 20px 32px}
 }
 </style>
+<link rel="stylesheet" href="css/themes.css">
+<link rel="manifest" href="/manifest.json">
 </head>
 <body>
 
@@ -194,30 +224,59 @@ a{color:var(--accent);text-decoration:none}
  <a href="index.html" class="logo"><div class="logo-mark">H</div><span data-zh="AIHues">AIHues</span></a>
  <div class="nav-links">
  <a href="#categories" data-zh="分类">Categories</a>
- <a href="#new-tools" data-zh="工具">Tools</a>
+ <a href="tools.html" data-zh="工具">Tools</a>
  <a href="#games" data-zh="游戏">Games</a>
  <a href="wishlist.html" data-zh="许愿单">Wishlist</a>
  <a href="ranking.html" data-zh="排行榜">Ranking</a>
  </div>
  <div style="display:flex;gap:10px;align-items:center">
+ <div id="theme-selector" style="display:flex;gap:4px;align-items:center"></div>
  <button class="lang-btn" onclick="toggleLang()" data-zh="EN">中文</button>
- <a href="login.html" class="nav-cta"><span data-zh="登录">Login</span></a>
+ <a href="javascript:void(0)" class="nav-cta" onclick="openLogin()"><span data-zh="登录">Login</span></a>
  </div>
  </div>
 </nav>
+
+<!-- LOGIN MODAL -->
+<div class="login-modal" id="loginModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:200;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px);align-items:center;justify-content:center">
+ <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:32px;max-width:420px;width:90%;max-height:80vh;overflow-y:auto;position:relative">
+  <button onclick="closeLogin()" style="position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
+  <div style="text-align:center;margin-bottom:24px">
+   <div style="width:44px;height:44px;border-radius:12px;background:var(--accent-gradient);display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;font-weight:700;margin:0 auto 12px">H</div>
+   <h2 style="font-size:20px;font-weight:700;margin-bottom:4px" data-zh="登录 AIHues">Login to AIHues</h2>
+   <p style="font-size:13px;color:var(--text-secondary)" data-zh="选择你的登录方式">Choose your login method</p>
+  </div>
+  <div style="margin-bottom:16px">
+   <label style="display:block;font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px" data-zh="Kimi ID">Kimi ID</label>
+   <input type="text" id="modalKimiId" placeholder="Enter your Kimi ID" data-zh-placeholder="输入你的 Kimi ID" style="width:100%;padding:10px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);font-size:14px;background:var(--bg);color:var(--text);outline:none;box-sizing:border-box" onkeydown="if(event.key==='Enter')modalKimiLogin()">
+  </div>
+  <button onclick="modalKimiLogin()" style="width:100%;padding:12px;border-radius:var(--radius-sm);background:var(--accent-gradient);color:#fff;font-size:15px;font-weight:600;border:none;cursor:pointer;margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:8px">
+   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+   <span data-zh="使用 Kimi ID 登录">Login with Kimi ID</span>
+  </button>
+  <div style="display:flex;align-items:center;gap:12px;margin:16px 0">
+   <div style="flex:1;height:1px;background:var(--border)"></div>
+   <span style="font-size:12px;color:var(--text-muted)" data-zh="或">or</span>
+   <div style="flex:1;height:1px;background:var(--border)"></div>
+  </div>
+  <button onclick="modalQuickLogin()" style="width:100%;padding:10px;border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:14px;font-weight:500;border:1px solid var(--border);cursor:pointer;margin-bottom:8px" data-zh="快速登录（无需密码）">Quick Login (no password)</button>
+  <button onclick="modalGuestLogin()" style="width:100%;padding:10px;border-radius:var(--radius-sm);background:transparent;color:var(--text-secondary);font-size:13px;border:none;cursor:pointer" data-zh="以游客身份进入">Enter as Guest</button>
+ </div>
+</div>
+<style>.login-modal{display:none}.login-modal.show{display:flex;animation:fadeIn 0.2s ease}@keyframes fadeIn{from{opacity:0}to{opacity:1}}</style>
 
 <!-- HERO -->
 <section class="hero">
  <div class="hero-inner">
  <h1><span data-zh="找到你的">Find your</span> <span class="gradient" data-zh="AI vibe">AI vibe</span></h1>
- <p data-zh="35+ AI 工具、小游戏和实用工具，像人一样自然。告诉我们你需要什么。">
- 35+ AI tools, mini games & utilities that just work. Tell us what you need.
+ <p data-zh="57+ AI 工具、小游戏和实用工具，像人一样自然。告诉我们你需要什么。">
+ 57+ AI tools, mini games & utilities that just work. Tell us what you need.
  </p>
  <!-- AI Agent Search -->
  <div class="agent-box">
  <div class="agent-box-inner" id="searchInner">
  <div class="agent-icon" id="searchIcon">🤖</div>
- <input type="text" id="agentInput" placeholder="e.g. 'parse JWT' or 'test regex'..." data-zh-placeholder="例如：解析JWT、测试正则、生成二维码..." oninput="aiSearch()" onkeydown="if(event.key==='Enter')aiGo()" autocomplete="off">
+ <input type="text" id="agentInput" placeholder="e.g. 'parse JWT'... (Press / to focus)" data-zh-placeholder="例如：解析JWT... (按 / 聚焦)" oninput="aiSearch()" onkeydown="if(event.key==='Enter')aiGo()" autocomplete="off">
  <button onclick="aiGo()" data-zh="查找">Ask AI</button>
  </div>
  <div class="ai-dropdown" id="aiDropdown"></div>
@@ -266,8 +325,8 @@ a{color:var(--accent);text-decoration:none}
 <!-- STATS -->
 <div class="stats-bar">
  <div class="stats-bar-inner">
- <div class="stat-item"><div class="stat-num">17</div><div class="stat-label" data-zh="AI 工具">AI Tools</div></div>
- <div class="stat-item"><div class="stat-num">7</div><div class="stat-label" data-zh="开发工具">Dev Tools</div></div>
+ <div class="stat-item"><div class="stat-num">57</div><div class="stat-label" data-zh="AI 工具">AI Tools</div></div>
+ <div class="stat-item"><div class="stat-num">32</div><div class="stat-label" data-zh="开发工具">Dev Tools</div></div>
  <div class="stat-item"><div class="stat-num">3</div><div class="stat-label" data-zh="小游戏">Games</div></div>
  <div class="stat-item"><div class="stat-num">100</div><div class="stat-label" data-zh="免费积分">Free Credits</div></div>
  <div class="stat-item"><div class="stat-num">3</div><div class="stat-label" data-zh="连击天数">Day Streak</div></div>
@@ -278,7 +337,7 @@ a{color:var(--accent);text-decoration:none}
 <section class="section" id="new-tools">
  <div class="section-header" id="developer">
  <h2 data-zh="🛠️ 开发工具（本周新增）">🛠️ Developer Tools (New This Week)</h2>
- <span class="section-count">7 tools</span>
+ <span class="section-count">32 tools</span>
  </div>
  <div class="tools-grid">
  <a href="tools/jwt.html" class="tool-card"><span class="badge-new">NEW</span>
@@ -302,7 +361,7 @@ a{color:var(--accent);text-decoration:none}
 <section class="section" style="padding-top:0" id="writing">
  <div class="section-header">
  <h2 data-zh="✍️ 写作与实用工具">✍️ Writing & Utility</h2>
- <span class="section-count">7 tools</span>
+ <span class="section-count">24 tools</span>
  </div>
  <div class="tools-grid">
  <a href="tools/word-count.html" class="tool-card">
@@ -417,7 +476,7 @@ a{color:var(--accent);text-decoration:none}
  <div class="footer-top">
  <div class="footer-brand">
  <div class="logo"><div class="logo-mark">H</div><span>AIHues</span></div>
- <p data-zh="找到你的 AI vibe。17款工具 + 3款游戏，像人一样自然。">Find your AI vibe. 17 tools + 3 games<br>that feel human.</p>
+ <p data-zh="找到你的 AI vibe。57款工具 + 3款游戏，像人一样自然。">Find your AI vibe. 17 tools + 3 games<br>that feel human.</p>
  </div>
  <div class="footer-links">
  <div class="footer-col">
@@ -446,11 +505,15 @@ a{color:var(--accent);text-decoration:none}
 </footer>
 
 <script src="js/i18n.js"></script>
+<script src="js/theme-system.js"></script>
+<script src="js/achievements.js"></script>
 <script>
 // ===== AI AGENT SEARCH =====
 const TOOL_DB=[
   {name:'JWT Parser',zhName:'JWT解析器',url:'tools/jwt.html',icon:'🔐',cat:'Developer',desc:'Decode and inspect JWT tokens',zhDesc:'解码JWT令牌',keywords:'jwt token parse decode auth bearer header payload signature json web token authentication'},{name:'JSON Formatter',zhName:'JSON格式化',url:'tools/json.html',icon:'📋',cat:'Developer',desc:'Format, validate and beautify JSON',zhDesc:'格式化JSON',keywords:'json format pretty beautify validate editor highlight tree'},{name:'Regex Tester',zhName:'正则测试器',url:'tools/regex.html',icon:'🔍',cat:'Developer',desc:'Test and debug regular expressions',zhDesc:'正则表达式测试',keywords:'regex regexp regular expression pattern match test replace pattern matching'},{name:'UUID Generator',zhName:'UUID生成器',url:'tools/uuid.html',icon:'🆔',cat:'Developer',desc:'Generate random UUIDs in bulk',zhDesc:'生成UUID',keywords:'uuid guid generate id identifier unique random v4'},{name:'Timestamp',zhName:'时间戳转换',url:'tools/timestamp.html',icon:'⏱️',cat:'Developer',desc:'Unix timestamp and human date converter',zhDesc:'Unix时间戳转换',keywords:'timestamp epoch time date convert unix utc timezone'},{name:'Markdown',zhName:'Markdown预览',url:'tools/markdown.html',icon:'📝',cat:'Writing',desc:'Live Markdown preview with GFM',zhDesc:'Markdown预览',keywords:'markdown md preview render editor github gfm'},{name:'QR Code',zhName:'二维码生成',url:'tools/qrcode.html',icon:'📱',cat:'Growth',desc:'Generate QR codes for URLs and WiFi',zhDesc:'生成二维码',keywords:'qr code qrcode generate url wifi email barcode scan'},{name:'SHA256',zhName:'SHA256哈希',url:'tools/sha256.html',icon:'🔒',cat:'Developer',desc:'Hash text and files with SHA-256',zhDesc:'SHA256哈希',keywords:'sha256 sha1 md5 hash checksum file crypto digest'},{name:'Fullwidth',zhName:'全角半角转换',url:'tools/fullwidth.html',icon:'↔️',cat:'Writing',desc:'Fullwidth and halfwidth converter',zhDesc:'全角半角转换',keywords:'fullwidth halfwidth convert width space clean text format'},{name:'A/B Test',zhName:'A/B测试',url:'tools/chi-squared.html',icon:'📊',cat:'Growth',desc:'Statistical significance calculator',zhDesc:'A/B测试统计',keywords:'ab test chi square significance statistics conversion rate'},{name:'Word Count',zhName:'字数统计',url:'tools/word-count.html',icon:'📊',cat:'Writing',desc:'Real-time word count and reading time',zhDesc:'字数统计',keywords:'word count character reading time text statistics'},{name:'Base64',zhName:'Base64',url:'tools/base64.html',icon:'🔢',cat:'Developer',desc:'Base64 encode and decode',zhDesc:'Base64编解码',keywords:'base64 encode decode binary text conversion'},{name:'Diff',zhName:'文本对比',url:'tools/diff.html',icon:'📑',cat:'Writing',desc:'Compare text differences',zhDesc:'对比文本差异',keywords:'diff compare difference text line'},{name:'Daily Fortune',zhName:'日历幸运签',url:'games/daily-luck.html',icon:'📅',cat:'Game',desc:'Daily fortune draw with wisdom quotes',zhDesc:'每日幸运签',keywords:'fortune luck daily draw card game wisdom relax fun'},{name:'Lucky Slots',zhName:'幸运老虎机',url:'games/slot-machine.html',icon:'🎰',cat:'Game',desc:'Slot machine with free daily spins',zhDesc:'老虎机',keywords:'slot machine slots casino spin reel game jackpot'},{name:'Hoops',zhName:'投篮挑战',url:'games/basketball.html',icon:'🏀',cat:'Game',desc:'Basketball shooting game',zhDesc:'投篮游戏',keywords:'basketball hoops shoot game sport challenge score'},{name:'URL Encode',zhName:'URL编解码',url:'tools/url-encode.html',icon:'🔗',cat:'Developer',desc:'Encode and decode URLs and query params',zhDesc:'URL编码解码',keywords:'url encode decode percent query parameter uri escape'},{name:'Base Converter',zhName:'进制转换',url:'tools/base-convert.html',icon:'🔢',cat:'Developer',desc:'Binary octal decimal hex converter',zhDesc:'进制转换器',keywords:'base binary octal decimal hex hexadecimal radix convert number bit'},{name:'Password Gen',zhName:'密码生成',url:'tools/password-gen.html',icon:'🔑',cat:'Developer',desc:'Generate secure random passwords',zhDesc:'密码生成器',keywords:'password generator secure random strong passphrase'},{name:'Title Case',zhName:'标题大小写',url:'tools/title-case.html',icon:'📰',cat:'Writing',desc:'Convert text to title case and more',zhDesc:'标题大小写转换',keywords:'title case camel snake kebab pascal convert text format'},{name:'HTTP Status',zhName:'HTTP状态码',url:'tools/http-status.html',icon:'🌐',cat:'Developer',desc:'HTTP status code reference',zhDesc:'HTTP状态码查询',keywords:'http status code 200 404 500 error reference'},{name:'HTML Entity',zhName:'HTML实体',url:'tools/html-entity.html',icon:'◈',cat:'Developer',desc:'HTML entity and Unicode converter',zhDesc:'HTML实体转换',keywords:'html entity unicode encode decode special character'},{name:'Pomodoro',zhName:'番茄钟',url:'tools/pomodoro.html',icon:'🍅',cat:'Productivity',desc:'Pomodoro timer for productivity',zhDesc:'番茄工作法计时器',keywords:'pomodoro timer focus productivity time management'},{name:'Cron Parser',zhName:'Cron解析',url:'tools/cron-parser.html',icon:'⏰',cat:'Developer',desc:'Parse cron expressions',zhDesc:'Cron表达式解析',keywords:'cron expression schedule parse crontab next execution'}
-];
+,{name:'Image to Base64',zhName:'图片转Base64',url:'tools/image-to-base64.html',icon:'🖼️',cat:'Developer',desc:'Convert images to Base64 strings',zhDesc:'图片转Base64',keywords:'image base64 convert encode decode data url file png jpg'},{name:'CSS Gradient',zhName:'CSS渐变',url:'tools/css-gradient.html',icon:'🌈',cat:'Developer',desc:'Create CSS gradients visually',zhDesc:'CSS渐变生成器',keywords:'css gradient linear radial conic color generator visual'},{name:'Color Converter',zhName:'色值转换',url:'tools/color-convert.html',icon:'🎨',cat:'Developer',desc:'Convert HEX RGB HSL CMYK colors',zhDesc:'色值转换器',keywords:'color convert hex rgb hsl cmyk picker palette'},{name:'CSV JSON',zhName:'CSV转JSON',url:'tools/csv-json.html',icon:'📊',cat:'Developer',desc:'Convert between CSV and JSON',zhDesc:'CSV与JSON互转',keywords:'csv json convert table excel spreadsheet parse'}
+,{name:'IP Lookup',zhName:'IP查询',url:'tools/ip-lookup.html',icon:'🔍',cat:'Developer',desc:'IP geolocation lookup',zhDesc:'IP地理位置查询',keywords:'ip lookup geolocation address location country city'},{name:'Curl Gen',zhName:'Curl生成',url:'tools/curl-gen.html',icon:'🌐',cat:'Developer',desc:'Generate curl commands',zhDesc:'生成curl命令',keywords:'curl command generate http api request header body'},{name:'Lorem Ipsum',zhName:'随机文本',url:'tools/lorem-ipsum.html',icon:'📝',cat:'Writing',desc:'Random text generator',zhDesc:'随机文本生成',keywords:'lorem ipsum random text generator placeholder dummy'},{name:'Diff Pro',zhName:'高级对比',url:'tools/diff-pro.html',icon:'📑',cat:'Developer',desc:'Advanced text diff',zhDesc:'高级文本差异对比',keywords:'diff compare text difference line word character'},{name:'Unit Convert',zhName:'单位转换',url:'tools/unit-convert.html',icon:'📐',cat:'Developer',desc:'Unit converter',zhDesc:'单位转换器',keywords:'unit convert length weight temperature area data time'}
+]
 
 let searchTimer=null;
 function aiSearch(){
@@ -489,10 +552,10 @@ function showResults(query){
   }).filter(t=>t.score>0).sort((a,b)=>b.score-a.score).slice(0,8);
   const dd=document.getElementById('aiDropdown');
   if(results.length===0){
-    dd.innerHTML='<div class="ai-thinking"><span>No matching tools found. Try different keywords.</span></div>';
+    dd.innerHTML='<div class="ai-thinking"><span>No matching tools. <a href="wishlist.html">Submit a request?</a></span></div>';
     return;
   }
-  dd.innerHTML=results.map((r,i)=>'<div class="ai-result-item" onclick="goTool(\''+r.url+'\')">'+
+  dd.innerHTML=results.map(r=>'<div class="ai-result-item" onclick="goTool(\''+r.url+'\')">'+
     '<div class="ai-result-icon">'+r.icon+'</div>'+
     '<div class="ai-result-info"><div class="ai-result-name">'+r.displayName+'</div><div class="ai-result-desc">'+r.displayDesc+'</div></div>'+
     '<span class="ai-result-tag">'+r.cat+'</span></div>').join('');
@@ -509,11 +572,64 @@ function aiGo(){
 }
 function goTool(url){window.location.href=url}
 document.addEventListener('click',function(e){if(!e.target.closest('.agent-box'))document.getElementById('aiDropdown').classList.remove('show')});
-// Credit
-function loadCredit(){const c=localStorage.getItem('aihues_credit');if(c)document.getElementById('creditDisplay').textContent=c}
+
+// Theme system initialized by theme-system.js
+
+// ===== KEYBOARD SHORTCUTS =====
+document.addEventListener('keydown',function(e){
+  if(e.key==='/'&&document.activeElement.tagName!=='INPUT'&&document.activeElement.tagName!=='TEXTAREA'){
+    e.preventDefault();document.getElementById('agentInput').focus();
+  }
+  if(e.key==='Escape'){
+    document.getElementById('aiDropdown').classList.remove('show');
+    document.getElementById('agentInput').blur();
+  }
+});
+
+// ===== CREDIT =====
+// ===== LOGIN MODAL =====
+function openLogin(){
+  const modal=document.getElementById('loginModal');
+  if(modal){modal.classList.add('show');document.getElementById('loginModal').style.display='flex';document.body.style.overflow='hidden';}
+}
+function closeLogin(){
+  const modal=document.getElementById('loginModal');
+  if(modal){modal.classList.remove('show');document.getElementById('loginModal').style.display='none';document.body.style.overflow='';}
+}
+function modalKimiLogin(){
+  const id=document.getElementById('modalKimiId').value.trim();
+  if(!id){alert('Please enter your Kimi ID / 请输入 Kimi ID');return;}
+  localStorage.setItem('aihues_current_user',JSON.stringify({username:id,loginType:'kimi',loginTime:Date.now()}));
+  if(!localStorage.getItem('aihues_credit'))localStorage.setItem('aihues_credit','100');
+  closeLogin();alert('Welcome, '+id+'! / 欢迎，'+id+'!');
+}
+function modalQuickLogin(){
+  const names=['Alex','Sam','Jordan','Taylor','Morgan','Casey'];
+  const name=names[Math.floor(Math.random()*names.length)];
+  localStorage.setItem('aihues_current_user',JSON.stringify({username:name,loginType:'quick',loginTime:Date.now()}));
+  if(!localStorage.getItem('aihues_credit'))localStorage.setItem('aihues_credit','100');
+  closeLogin();alert('Welcome, '+name+'! / 欢迎，'+name+'!');
+}
+function modalGuestLogin(){
+  localStorage.setItem('aihues_current_user',JSON.stringify({username:'Guest',loginType:'guest',loginTime:Date.now()}));
+  localStorage.setItem('aihues_credit','100');
+  closeLogin();
+}
+
+function loadCredit(){
+  const c=localStorage.getItem('aihues_credit');
+  if(c)document.getElementById('creditDisplay').textContent=c;
+}
 loadCredit();
-// i18n toggle
-function toggleLang(){/* placeholder */}
+</script>
+
+<script>
+// Register Service Worker for offline support
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js')
+    .then(reg => console.log('SW registered:', reg.scope))
+    .catch(err => console.log('SW registration failed:', err));
+}
 </script>
 </body>
 </html>

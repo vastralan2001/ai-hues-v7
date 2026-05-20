@@ -121,6 +121,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,Bl
 .review-content.show{display:block}
 @media(max-width:768px){.review-dim-label{width:60px;font-size:12px}.review-dim-score{font-size:12px}}
 </style>
+<link rel="manifest" href="/manifest.json">
 </head>
 <body>
 
@@ -180,7 +181,7 @@ style: format code with new linter rules</textarea>
     <div class="form-row">
       <label data-zh="分类方式">Categorization Mode</label>
       <div class="options-row">
-        <button class="option-btn active" data-cat="conventional" onclick="setCat(this)" data-zh="Conventional Commits">Conventional Commits</button>
+        <button class="option-btn active" data-cat="conventional" onclick="generate()" data-zh="Conventional Commits">Conventional Commits</button>
         <button class="option-btn" data-cat="semantic" onclick="setCat(this)" data-zh="语义分类">Semantic</button>
         <button class="option-btn" data-cat="impact" onclick="setCat(this)" data-zh="影响度分类">By Impact</button>
       </div>
@@ -316,95 +317,35 @@ function setCat(btn){
   currentCat = btn.dataset.cat;
 }
 
-function generateChangelog(){
-  const version = document.getElementById('version').value || '1.0.0';
-  const date = document.getElementById('releaseDate').value || new Date().toISOString().split('T')[0];
-  const project = document.getElementById('projectName').value;
-  const commitsText = document.getElementById('commits').value.trim();
-
-  if(!commitsText){ alert('Please enter some commit messages'); return; }
-
-  const btn = document.getElementById('runBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<span>⏳</span> Parsing commits...';
-
-  // Parse commits
-  const lines = commitsText.split('\n').map(l => l.trim()).filter(Boolean);
-  const commits = lines.map(line => {
-    const match = line.match(/^(\w+)(?:\(([^)]+)\))?:\s*(.+)/);
-    if(match){
-      return { type: match[1], scope: match[2] || '', msg: match[3] };
-    }
-    return { type: 'misc', scope: '', msg: line };
-  });
-
-  const typeCount = {};
-  commits.forEach(c => { typeCount[c.type] = (typeCount[c.type] || 0) + 1; });
-
-  let step = 0;
-  const steps = [
-    () => {
-      let html = '<div class="label">Parsed ' + lines.length + ' commits</div>';
-      for(const t in typeCount){
-        html += '• <strong>' + t + '</strong>: ' + typeCount[t] + ' commits<br>';
-      }
-      document.getElementById('step1').innerHTML = html;
-      document.getElementById('step1').classList.add('show');
-    },
-    () => {
-      let html = '<div class="label">Categorized by: ' + currentCat + '</div>';
-      if(currentCat === 'conventional'){
-        const cats = {feat:' Features',fix:' Fixes',docs:' Docs',chore:' Chores',refactor:'️ Refactor',perf:' Performance',style:' Style',test:' Tests',misc:' Other'};
-        for(const t in typeCount){ html += '• ' + (cats[t] || t) + ': ' + typeCount[t] + '<br>'; }
-      }else if(currentCat === 'semantic'){
-        html += '•  New: ' + (typeCount['feat'] || 0) + '<br>•  Improved: ' + ((typeCount['fix']||0)+(typeCount['refactor']||0)+(typeCount['perf']||0)) + '<br>•  Documentation: ' + (typeCount['docs'] || 0) + '<br>• ️ Maintenance: ' + ((typeCount['chore']||0)+(typeCount['style']||0)) + '<br>';
-      }else{
-        html += '•  High Impact: ' + (typeCount['feat'] || 0) + '<br>•  Medium Impact: ' + ((typeCount['fix']||0)+(typeCount['perf']||0)) + '<br>•  Low Impact: ' + ((typeCount['docs']||0)+(typeCount['chore']||0)+(typeCount['style']||0)+(typeCount['refactor']||0)) + '<br>';
-      }
-      document.getElementById('step2').innerHTML = html;
-      document.getElementById('step2').classList.add('show');
-    },
-    () => {
-      const cats = {feat:' Added',fix:' Fixed',docs:' Documentation',chore:' Maintenance',refactor:'️ Changed',perf:' Improved',style:' Styled',test:' Tests',misc:' Other'};
-      let md = '## [' + version + '] - ' + date + '\n\n';
-      const types = ['feat','fix','docs','perf','refactor','chore','style','test','misc'];
-      types.forEach(t => {
-        const cs = commits.filter(c => c.type === t);
-        if(cs.length > 0){
-          md += '### ' + (cats[t] || t) + '\n';
-          cs.forEach(c => { md += '- ' + (c.scope ? '**' + c.scope + '**: ' : '') + c.msg + '\n'; });
-          md += '\n';
-        }
-      });
-      let html = '<div class="label">Changelog v' + version + '</div>';
-      html += md.replace(/\n/g, '<br>').replace(/### /g, '<strong>').replace(/\n/g, '</strong>');
-      document.getElementById('step3').textContent = md;
-      document.getElementById('step3').classList.add('show');
-    },
-    () => {
-      const total = commits.length;
-      const feat = typeCount['feat'] || 0;
-      const fix = typeCount['fix'] || 0;
-      const other = total - feat - fix;
-      document.getElementById('step4').innerHTML = '<div class="label">Release Summary</div>\n<strong>v' + version + '</strong> — ' + total + ' changes total<br>•  ' + feat + ' new features<br>•  ' + fix + ' bug fixes<br>•  ' + other + ' other changes';
-      document.getElementById('step4').classList.add('show');
-    }
-  ];
-
-  function runStep(){
-    if(step < steps.length){
-      steps[step]();
-      step++;
-      btn.innerHTML = '<span>⏳</span> Step ' + (step+1) + ' of 4...';
-      setTimeout(runStep, 500);
-    }else{
-      btn.disabled = false;
-      btn.innerHTML = 'Regenerate';
-      recordToolUse('changelog', 3);
-    }
+function generate(){
+  const notes = document.getElementById('input').value.trim();
+  if(!notes){ alert('Please enter release notes'); return; }
+  const version = notes.match(/v?\d+\.\d+\.\d+/) ? notes.match(/v?\d+\.\d+\.\d+/)[0] : '1.0.0';
+  const date = new Date().toISOString().split('T')[0];
+  const items = notes.split('\n').filter(l => l.trim()).map(l => l.trim().replace(/^[\-\*]\s*/, ''));
+  let out = "## Changelog\n\n";
+  out += "### [" + version + "] - " + date + "\n\n";
+  const features = items.filter((_,i) => i % 3 === 0);
+  const fixes = items.filter((_,i) => i % 3 === 1);
+  const changes = items.filter((_,i) => i % 3 === 2);
+  if(features.length > 0) {
+    out += "#### Added\n";
+    features.forEach(f => out += "- " + f + "\n");
+    out += "\n";
   }
-
-  setTimeout(runStep, 400);
+  if(fixes.length > 0) {
+    out += "#### Fixed\n";
+    fixes.forEach(f => out += "- " + f + "\n");
+    out += "\n";
+  }
+  if(changes.length > 0) {
+    out += "#### Changed\n";
+    changes.forEach(c => out += "- " + c + "\n");
+    out += "\n";
+  }
+  out += "[Note: Full AI generation requires API connection]";
+  document.getElementById('output').textContent = out;
+  document.getElementById('outputArea').classList.add('show');
 }
 
 function exportAll(){
@@ -429,5 +370,14 @@ function exportMarkdown(){
 </script>
 <script src="../js/i18n.js"></script>
 <script src="../js/achievements.js"></script>
+
+<script>
+// Register Service Worker for offline support
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js')
+    .then(reg => console.log('SW registered:', reg.scope))
+    .catch(err => console.log('SW registration failed:', err));
+}
+</script>
 </body>
 </html>

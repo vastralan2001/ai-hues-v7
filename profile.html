@@ -728,6 +728,8 @@ footer a { color: var(--accent); text-decoration: none; font-weight: 500; }
   transform: translateY(0);
 }
 </style>
+<link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="css/themes.css">
 </head>
 <body>
 
@@ -1217,6 +1219,18 @@ function init() {
 }
 
 init();
+</script>
+<script src="js/i18n.js"></script>
+<script src="js/theme-system.js"></script>
+<script src="js/achievements.js"></script>
+
+<script>
+// Register Service Worker for offline support
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js')
+    .then(reg => console.log('SW registered:', reg.scope))
+    .catch(err => console.log('SW registration failed:', err));
+}
 </script>
 </body>
 </html>

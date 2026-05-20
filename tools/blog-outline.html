@@ -61,6 +61,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,Bl
 
 .footer{border-top:1px solid var(--border);padding:48px 32px;text-align:center;color:var(--text-muted);font-size:14px;margin-top:60px}
 </style>
+<link rel="manifest" href="/manifest.json">
 </head>
 <body>
 
@@ -222,18 +223,21 @@ const demoOutput = `# How to Build a Micro-SaaS in 30 Days
 
 function runTool(){
   const input = document.getElementById('input').value.trim();
-  if(!input){ alert('Please enter some content'); return; }
-  
+  if(!input){ alert('Please enter a blog topic'); return; }
   const btn = document.getElementById('runBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<span>⏳</span> Processing...';
-  
+  btn.disabled = true; btn.innerHTML = '<span>⏳</span> Processing...';
   setTimeout(() => {
-    document.getElementById('output').textContent = demoOutput;
+    let out = "## Blog Outline: " + input + "\n\n";
+    out += "### 1. Introduction\n- Hook: Why " + input + " matters now\n- Brief overview\n- Thesis statement\n\n";
+    out += "### 2. What is " + input + "?\n- Definition and background\n- Key concepts\n- Why it matters\n\n";
+    out += "### 3. Benefits\n- Benefit 1: Efficiency gains\n- Benefit 2: Cost savings\n- Benefit 3: Competitive advantage\n\n";
+    out += "### 4. How to Get Started\n- Step-by-step guide\n- Tools and resources\n- Common pitfalls\n\n";
+    out += "### 5. Best Practices\n- Industry standards\n- Expert tips\n- Real-world examples\n\n";
+    out += "### 6. Conclusion\n- Summary\n- Call to action\n- Further reading\n\n[Full AI generation requires API]";
+    document.getElementById('output').textContent = out;
     document.getElementById('outputArea').classList.add('show');
-    btn.disabled = false;
-    btn.innerHTML = 'Regenerate';
-  }, 1200);
+    btn.disabled = false; btn.innerHTML = 'Regenerate';
+  }, 800);
 }
 
 function copyOutput(){
@@ -255,5 +259,15 @@ document.getElementById('input').addEventListener('input', function(){
 });
 </script>
 
+<script src="../js/i18n.js"></script>
+
+<script>
+// Register Service Worker for offline support
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js')
+    .then(reg => console.log('SW registered:', reg.scope))
+    .catch(err => console.log('SW registration failed:', err));
+}
+</script>
 </body>
 </html>

@@ -61,6 +61,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,Bl
 
 .footer{border-top:1px solid var(--border);padding:48px 32px;text-align:center;color:var(--text-muted);font-size:14px;margin-top:60px}
 </style>
+<link rel="manifest" href="/manifest.json">
 </head>
 <body>
 
@@ -216,18 +217,21 @@ const demoOutput = `**Function:** fibonacci(n)
 
 function runTool(){
   const input = document.getElementById('input').value.trim();
-  if(!input){ alert('Please enter some content'); return; }
-  
+  if(!input){ alert('Please paste some code'); return; }
   const btn = document.getElementById('runBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<span>⏳</span> Processing...';
-  
+  btn.disabled = true; btn.innerHTML = '<span>⏳</span> Processing...';
   setTimeout(() => {
-    document.getElementById('output').textContent = demoOutput;
+    const lines = input.split('\n');
+    const funcs = input.match(/function\s+(\w+)/g) || [];
+    const vars = input.match(/(const|let|var)\s+(\w+)/g) || [];
+    let out = "## Code Explanation\n\n";
+    out += "**Lines**: " + lines.length + " | **Functions**: " + funcs.length + " | **Variables**: " + vars.length + "\n\n";
+    if(funcs.length > 0) { out += "### Functions\n"; funcs.forEach((f,i) => out += (i+1) + ". `" + f.replace('function ','') + "`\n"); out += "\n"; }
+    out += "### Summary\nThis code " + (funcs.length > 0 ? "defines " + funcs.length + " function(s)" : "executes a script") + ". It declares " + vars.length + " variable(s). The purpose is likely to process data based on input.\n\n[Full AI explanation requires API]";
+    document.getElementById('output').textContent = out;
     document.getElementById('outputArea').classList.add('show');
-    btn.disabled = false;
-    btn.innerHTML = 'Regenerate';
-  }, 1200);
+    btn.disabled = false; btn.innerHTML = 'Regenerate';
+  }, 800);
 }
 
 function copyOutput(){
@@ -249,5 +253,15 @@ document.getElementById('input').addEventListener('input', function(){
 });
 </script>
 
+<script src="../js/i18n.js"></script>
+
+<script>
+// Register Service Worker for offline support
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js')
+    .then(reg => console.log('SW registered:', reg.scope))
+    .catch(err => console.log('SW registration failed:', err));
+}
+</script>
 </body>
 </html>

@@ -61,6 +61,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,Bl
 
 .footer{border-top:1px solid var(--border);padding:48px 32px;text-align:center;color:var(--text-muted);font-size:14px;margin-top:60px}
 </style>
+<link rel="manifest" href="/manifest.json">
 </head>
 <body>
 
@@ -212,18 +213,24 @@ const demoOutput = `**Code Review Checklist**
 
 function runTool(){
   const input = document.getElementById('input').value.trim();
-  if(!input){ alert('Please enter some content'); return; }
-  
+  if(!input){ alert('Please paste some code'); return; }
   const btn = document.getElementById('runBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<span>⏳</span> Processing...';
-  
+  btn.disabled = true; btn.innerHTML = '<span>⏳</span> Processing...';
   setTimeout(() => {
-    document.getElementById('output').textContent = demoOutput;
+    const issues = [];
+    if(input.length > 500) issues.push("⚠️ Consider breaking into smaller functions");
+    if(!input.includes('//') && !input.includes('/*')) issues.push("⚠️ Missing comments");
+    if((input.match(/console\.log/g) || []).length > 3) issues.push("⚠️ Remove console.log statements");
+    if(input.includes('var ')) issues.push("⚠️ Use `let` or `const` instead of `var`");
+    let out = "## Code Review\n\n";
+    out += "**Score**: " + (issues.length === 0 ? "9/10 ✅" : (10-issues.length) + "/10") + "\n\n";
+    if(issues.length === 0) out += "✅ No major issues!\n";
+    else { out += "### Issues (" + issues.length + ")\n\n"; issues.forEach(issue => out += issue + "\n\n"); }
+    out += "\n### Suggestions\n- Add JSDoc comments\n- Consider unit tests\n- Review naming conventions\n\n[Full AI review requires API]";
+    document.getElementById('output').textContent = out;
     document.getElementById('outputArea').classList.add('show');
-    btn.disabled = false;
-    btn.innerHTML = 'Regenerate';
-  }, 1200);
+    btn.disabled = false; btn.innerHTML = 'Regenerate';
+  }, 800);
 }
 
 function copyOutput(){
@@ -245,5 +252,15 @@ document.getElementById('input').addEventListener('input', function(){
 });
 </script>
 
+<script src="../js/i18n.js"></script>
+
+<script>
+// Register Service Worker for offline support
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js')
+    .then(reg => console.log('SW registered:', reg.scope))
+    .catch(err => console.log('SW registration failed:', err));
+}
+</script>
 </body>
 </html>

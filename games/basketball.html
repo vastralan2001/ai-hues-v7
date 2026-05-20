@@ -228,6 +228,8 @@ main{position:relative;z-index:1}
   #gameCanvas{height:320px}
 }
 </style>
+<link rel="stylesheet" href="../css/themes.css">
+<link rel="manifest" href="/manifest.json">
 </head>
 <body>
 
@@ -381,6 +383,9 @@ main{position:relative;z-index:1}
         </button>
         <button class="btn btn-secondary" onclick="shareScore()">
           <span>&#128228;</span> Share Score
+        </button>
+        <button class="btn btn-secondary" onclick="generateShareCard()">
+          <span>&#127912;</span> Share Card
         </button>
       </div>
     </div>
@@ -1480,7 +1485,7 @@ function submitLeaderboardEntry() {
 
 // ===================== SHARE =====================
 function shareScore() {
-  const shareText = 'I scored ' + score + ' points in AIHues Hoops Challenge! Can you beat me? \u{1F3C8}\nPlay now at aihues.com';
+  const shareText = '我在AIHues投篮挑战中得了' + score + '分！你能超过我吗？\n\n\u{1F3C0} 来挑战：https://nptmdmptvfdmm.ok.kimi.link/games/basketball.html\n\nAIHues — 48个AI工具 + 小游戏';
 
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(shareText).then(() => {
@@ -1491,6 +1496,81 @@ function shareScore() {
   } else {
     fallbackShare(shareText);
   }
+}
+
+function generateShareCard() {
+  const finalScore = score || 0;
+  const finalBestStreak = bestStreak || 0;
+  const canvas = document.createElement('canvas');
+  canvas.width = 600;
+  canvas.height = 400;
+  const c = canvas.getContext('2d');
+
+  // 背景渐变（篮球场风格）
+  const grad = c.createLinearGradient(0, 0, 600, 400);
+  grad.addColorStop(0, '#1a0a2e');
+  grad.addColorStop(0.5, '#2d1810');
+  grad.addColorStop(1, '#1a0a2e');
+  c.fillStyle = grad;
+  c.fillRect(0, 0, 600, 400);
+
+  // 装饰性圆环（简化的篮球场地板线）
+  c.strokeStyle = 'rgba(212, 168, 67, 0.1)';
+  c.lineWidth = 2;
+  c.beginPath();
+  c.arc(300, 400, 180, 0, Math.PI, true);
+  c.stroke();
+
+  c.strokeStyle = 'rgba(212, 168, 67, 0.08)';
+  c.beginPath();
+  c.arc(300, 400, 260, 0, Math.PI, true);
+  c.stroke();
+
+  // 顶部品牌
+  c.fillStyle = '#8b5cf6';
+  c.font = 'bold 20px sans-serif';
+  c.textAlign = 'center';
+  c.fillText('\u{1F3C0} AIHUES \u00B7 HOOPS CHALLENGE', 300, 50);
+
+  // 分隔线
+  c.strokeStyle = '#d4a843';
+  c.lineWidth = 2;
+  c.beginPath();
+  c.moveTo(100, 70);
+  c.lineTo(500, 70);
+  c.stroke();
+
+  // 得分大字
+  c.fillStyle = '#ffffff';
+  c.font = 'bold 80px sans-serif';
+  c.fillText(finalScore, 300, 180);
+  c.font = '24px sans-serif';
+  c.fillStyle = '#94a3b8';
+  c.fillText('POINTS', 300, 210);
+
+  // 连击
+  if (finalBestStreak > 1) {
+    c.fillStyle = '#d4a843';
+    c.font = 'bold 28px sans-serif';
+    c.fillText('\u{1F525} ' + finalBestStreak + 'x STREAK', 300, 260);
+  }
+
+  // 底部引导
+  c.fillStyle = '#8b5cf6';
+  c.font = '16px sans-serif';
+  c.fillText('\u{1F3AF} 来挑战我 \u2192 nptmdmptvfdmm.ok.kimi.link', 300, 340);
+
+  c.fillStyle = '#64748b';
+  c.font = '14px sans-serif';
+  c.fillText('48 AI Tools + Mini Games', 300, 370);
+
+  // 下载
+  const link = document.createElement('a');
+  link.download = 'hoops-' + finalScore + '.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+
+  showToast('Share card downloaded!');
 }
 
 function fallbackShare(text) {
@@ -1508,6 +1588,18 @@ function showToast(msg) {
   toast.textContent = msg;
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), 2500);
+}
+</script>
+<script src="../js/i18n.js"></script>
+<script src="../js/theme-system.js"></script>
+<script src="../js/achievements.js"></script>
+
+<script>
+// Register Service Worker for offline support
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js')
+    .then(reg => console.log('SW registered:', reg.scope))
+    .catch(err => console.log('SW registration failed:', err));
 }
 </script>
 </body>

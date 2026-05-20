@@ -61,6 +61,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,Bl
 
 .footer{border-top:1px solid var(--border);padding:48px 32px;text-align:center;color:var(--text-muted);font-size:14px;margin-top:60px}
 </style>
+<link rel="manifest" href="/manifest.json">
 </head>
 <body>
 
@@ -215,18 +216,18 @@ P.S. — Happy to send over a quick demo video if that's easier.`;
 
 function runTool(){
   const input = document.getElementById('input').value.trim();
-  if(!input){ alert('Please enter some content'); return; }
-  
+  if(!input){ alert('Please enter prospect info'); return; }
   const btn = document.getElementById('runBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<span>⏳</span> Processing...';
-  
+  btn.disabled = true; btn.innerHTML = '<span>⏳</span> Processing...';
   setTimeout(() => {
-    document.getElementById('output').textContent = demoOutput;
+    let out = "## Cold Email Templates\n\n";
+    out += "### Template 1: Value-First\n\nSubject: Quick question about " + input.substring(0,30) + "\n\nHi [Name],\n\nI noticed you're working on " + input.substring(0,50) + ". We've helped similar companies achieve great results.\n\nWorth a brief conversation?\n\nBest,\n[Your Name]\n\n---\n\n";
+    out += "### Template 2: Social Proof\n\nSubject: How [Company] improved " + input.substring(0,30) + "\n\nHi [Name],\n\n[Company] saw significant improvement using our solution. I'd love to share how. 15 minutes this week?\n\nBest,\n[Your Name]\n\n---\n\n";
+    out += "### Template 3: Problem-Agitation\n\nSubject: The " + input.substring(0,30) + " problem\n\nHi [Name],\n\nMost teams struggle with " + input.substring(0,40) + ". It costs them time and money every month. We fix that. Interested?\n\nBest,\n[Your Name]\n\n[Full AI generation requires API]";
+    document.getElementById('output').textContent = out;
     document.getElementById('outputArea').classList.add('show');
-    btn.disabled = false;
-    btn.innerHTML = 'Regenerate';
-  }, 1200);
+    btn.disabled = false; btn.innerHTML = 'Regenerate';
+  }, 800);
 }
 
 function copyOutput(){
@@ -248,5 +249,15 @@ document.getElementById('input').addEventListener('input', function(){
 });
 </script>
 
+<script src="../js/i18n.js"></script>
+
+<script>
+// Register Service Worker for offline support
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js')
+    .then(reg => console.log('SW registered:', reg.scope))
+    .catch(err => console.log('SW registration failed:', err));
+}
+</script>
 </body>
 </html>

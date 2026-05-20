@@ -254,6 +254,13 @@
     .record-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(212,168,48,0.08);border:1px solid var(--vegas-gold-dark);border-radius:var(--radius-sm);color:var(--vegas-gold);font-size:0.8rem;font-weight:700;cursor:pointer;transition:all 0.2s}
     .record-btn:hover{background:rgba(212,168,48,0.15);transform:translateY(-1px)}
 
+    /* ===== SHARE SECTION ===== */
+    .share-section{display:none;justify-content:center;gap:8px;margin-top:14px;animation:fadeInUp 0.5s ease}
+    .share-section.active{display:flex}
+    .share-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(212,168,48,0.1);border:1.5px solid var(--vegas-gold-dark);border-radius:var(--radius-sm);color:var(--vegas-gold);font-size:0.8rem;font-weight:700;cursor:pointer;transition:all 0.2s}
+    .share-btn:hover{background:rgba(212,168,48,0.2);transform:translateY(-1px);box-shadow:0 4px 12px rgba(212,168,48,0.15)}
+    .share-btn:active{transform:translateY(0)}
+
     /* ===== SESSION STATS ===== */
     .session-stats{display:flex;justify-content:center;gap:16px;padding:10px 0;margin-top:8px;flex-wrap:wrap}
     .session-item{text-align:center}
@@ -265,6 +272,8 @@
     .panel::-webkit-scrollbar-track{background:transparent}
     .panel::-webkit-scrollbar-thumb{background:var(--vegas-gold-dark);border-radius:3px}
   </style>
+<link rel="stylesheet" href="../css/themes.css">
+<link rel="manifest" href="/manifest.json">
 </head>
 <body>
 
@@ -376,6 +385,16 @@
             <span id="spinsText">3 / 3</span>
           </div>
           <div class="spins-reset" id="spinsReset"></div>
+        </div>
+
+        <!-- Share Buttons (shown on win) -->
+        <div class="share-section" id="shareSection">
+          <button class="share-btn" onclick="shareWin()">
+            <span>&#128239;</span> Share Win
+          </button>
+          <button class="share-btn" onclick="generateShareCard()">
+            <span>&#127912;</span> Share Card
+          </button>
         </div>
 
         <!-- Record Buttons -->
@@ -910,7 +929,30 @@
       });
     }
 
+    // ===== SESSION STORAGE FOR SHARE =====
+    function getSessionStats() {
+      try {
+        return JSON.parse(localStorage.getItem('aihues_slots_session')) || { totalWins: 0, totalSpins: 0 };
+      } catch(e) { return { totalWins: 0, totalSpins: 0 }; }
+    }
+    function saveSessionStats(s) {
+      try { localStorage.setItem('aihues_slots_session', JSON.stringify(s)); } catch(e) {}
+    }
+    function updateSessionAfterWin(creditsWon) {
+      const s = getSessionStats();
+      s.totalWins = (s.totalWins || 0) + creditsWon;
+      s.totalSpins = (s.totalSpins || 0) + 1;
+      saveSessionStats(s);
+    }
+    function updateSessionAfterLoss() {
+      const s = getSessionStats();
+      s.totalSpins = (s.totalSpins || 0) + 1;
+      saveSessionStats(s);
+    }
+
     // ===== WIN CHECKING =====
+    let lastWinAmount = 0;
+
     function checkWins() {
       let totalWin = 0;
       let winningLines = [];
@@ -933,6 +975,7 @@
       if (totalWin > 0) {
         // Apply win
         addCredit(totalWin);
+        lastWinAmount = totalWin;
 
         // Determine winning symbol info
         const firstLine = winningLines[0];
@@ -947,6 +990,10 @@
         sessionWins++;
         sessionCreditsWon += totalWin;
         updateSessionStatsDisplay();
+        updateSessionAfterWin(totalWin);
+
+        // Show share section
+        document.getElementById('shareSection').classList.add('active');
 
         // Update leaderboard (track current player as "You")
         const stats = getSlotsStats();
@@ -973,6 +1020,9 @@
         // Update stats even on loss
         updateStatsAfterSpin(false, 0, false);
         updateSessionStatsDisplay();
+        updateSessionAfterLoss();
+        // Hide share section
+        document.getElementById('shareSection').classList.remove('active');
         showMessage('No match this time. Try again!', 'lose');
       }
     }
@@ -1151,6 +1201,106 @@
       }
     }
 
+    // ===== SHARE FUNCTIONS =====
+    function shareWin() {
+      const shareText = '🎰 我在AIHues老虎机中了' + lastWinAmount + ' Credit大奖！\n\n今日运势爆棚，来试试你的运气？\n👉 https://nptmdmptvfdmm.ok.kimi.link/games/slot-machine.html\n\nAIHues — 58个AI工具 + 小游戏';
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(shareText).then(() => {
+          showMessage('分享文字已复制到剪贴板！', 'win');
+        }).catch(() => fallbackCopy(shareText));
+      } else {
+        fallbackCopy(shareText);
+      }
+    }
+
+    function fallbackCopy(text) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      showMessage('分享文字已复制到剪贴板！', 'win');
+    }
+
+    function generateShareCard() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 600;
+      canvas.height = 400;
+      const ctx = canvas.getContext('2d');
+
+      // Background - deep purple gradient
+      const grad = ctx.createLinearGradient(0, 0, 600, 400);
+      grad.addColorStop(0, '#1a0a2e');
+      grad.addColorStop(0.5, '#0f0a1e');
+      grad.addColorStop(1, '#2d1810');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 600, 400);
+
+      // Decorative - gold particles (fixed positions for consistency)
+      ctx.fillStyle = 'rgba(212, 168, 67, 0.3)';
+      const particleSeeds = [42, 17, 89, 3, 56, 27, 71, 13, 95, 37, 61, 5, 83, 29, 47, 11, 67, 19, 53, 7, 79, 23, 41, 2, 58];
+      for (let i = 0; i < 25; i++) {
+        const x = (particleSeeds[i % particleSeeds.length] * 23 + i * 47) % 600;
+        const y = (particleSeeds[(i + 3) % particleSeeds.length] * 17 + i * 31) % 400;
+        const r = (particleSeeds[(i + 7) % particleSeeds.length] % 3) + 1;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Title
+      ctx.fillStyle = '#d4a843';
+      ctx.font = 'bold 28px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('\uD83C\uDFB0 AIHUES · LUCKY SLOTS', 300, 60);
+
+      // Divider line
+      ctx.strokeStyle = '#d4a843';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(150, 80);
+      ctx.lineTo(450, 80);
+      ctx.stroke();
+
+      // Today's stats
+      const stats = getSessionStats();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 72px sans-serif';
+      ctx.fillText((stats.totalWins || 0) + '', 300, 180);
+      ctx.font = '20px sans-serif';
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillText('CREDITS WON TODAY', 300, 210);
+
+      // Spins count
+      ctx.fillStyle = '#8b5cf6';
+      ctx.font = 'bold 24px sans-serif';
+      ctx.fillText('\uD83C\uDFAF ' + (stats.totalSpins || 0) + ' spins played', 300, 260);
+
+      // Last win info
+      if (lastWinAmount > 0) {
+        ctx.fillStyle = '#d4a843';
+        ctx.font = 'bold 18px sans-serif';
+        ctx.fillText('Last win: +' + lastWinAmount + ' Credits', 300, 300);
+      }
+
+      // CTA
+      ctx.fillStyle = '#d4a843';
+      ctx.font = '16px sans-serif';
+      ctx.fillText('Try your luck \u2192 nptmdmptvfdmm.ok.kimi.link', 300, 340);
+
+      ctx.fillStyle = '#64748b';
+      ctx.font = '14px sans-serif';
+      ctx.fillText('58 AI Tools + Mini Games', 300, 370);
+
+      // Download
+      const link = document.createElement('a');
+      link.download = 'slots-share.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      showMessage('分享卡片已下载！', 'win');
+    }
+
     // ===== RESPONSIVE CELL HEIGHT =====
     function getCellHeight() {
       const w = window.innerWidth;
@@ -1179,5 +1329,16 @@
     init();
   </script>
   <script src="../js/i18n.js"></script>
+<script src="../js/theme-system.js"></script>
+<script src="../js/achievements.js"></script>
+
+<script>
+// Register Service Worker for offline support
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js')
+    .then(reg => console.log('SW registered:', reg.scope))
+    .catch(err => console.log('SW registration failed:', err));
+}
+</script>
 </body>
 </html>

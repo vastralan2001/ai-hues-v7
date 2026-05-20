@@ -495,6 +495,7 @@
       background: var(--text-muted);
     }
   </style>
+<link rel="manifest" href="/manifest.json">
 </head>
 <body>
 
@@ -927,5 +928,15 @@
     // ===== Start =====
     init();
   </script>
+<script src="../js/i18n.js"></script>
+
+<script>
+// Register Service Worker for offline support
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js')
+    .then(reg => console.log('SW registered:', reg.scope))
+    .catch(err => console.log('SW registration failed:', err));
+}
+</script>
 </body>
 </html>

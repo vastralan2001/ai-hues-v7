@@ -61,6 +61,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,Bl
 
 .footer{border-top:1px solid var(--border);padding:48px 32px;text-align:center;color:var(--text-muted);font-size:14px;margin-top:60px}
 </style>
+<link rel="manifest" href="/manifest.json">
 </head>
 <body>
 
@@ -211,18 +212,28 @@ Bonus — variations:
 
 function runTool(){
   const input = document.getElementById('input').value.trim();
-  if(!input){ alert('Please enter some content'); return; }
-  
+  if(!input){ alert('Please describe your brand'); return; }
   const btn = document.getElementById('runBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<span>⏳</span> Processing...';
-  
+  btn.disabled = true; btn.innerHTML = '<span>⏳</span> Processing...';
   setTimeout(() => {
-    document.getElementById('output').textContent = demoOutput;
+    const words = input.split(' ');
+    const options = [
+      words.slice(0,3).join(' ') + ". Simplified.",
+      "The smarter way to " + words.slice(0,3).join(' ') + ".",
+      words.slice(0,2).join(' ') + ", reimagined.",
+      "Your " + words.slice(0,2).join(' ') + ", upgraded.",
+      "Less work. More " + (words[0] || 'results') + ".",
+      words.slice(0,3).join(' ') + ". For everyone.",
+      "Simply better " + words.slice(0,2).join(' ') + ".",
+      "Made for " + words.slice(0,2).join(' ') + "."
+    ];
+    let out = "## Tagline Options\n\n";
+    options.forEach((opt,i) => { out += (i+1) + ". **" + opt + "**\n   " + opt.length + " chars\n\n"; });
+    out += "[Full AI generation requires API]";
+    document.getElementById('output').textContent = out;
     document.getElementById('outputArea').classList.add('show');
-    btn.disabled = false;
-    btn.innerHTML = 'Regenerate';
-  }, 1200);
+    btn.disabled = false; btn.innerHTML = 'Regenerate';
+  }, 800);
 }
 
 function copyOutput(){
@@ -244,5 +255,15 @@ document.getElementById('input').addEventListener('input', function(){
 });
 </script>
 
+<script src="../js/i18n.js"></script>
+
+<script>
+// Register Service Worker for offline support
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js')
+    .then(reg => console.log('SW registered:', reg.scope))
+    .catch(err => console.log('SW registration failed:', err));
+}
+</script>
 </body>
 </html>
